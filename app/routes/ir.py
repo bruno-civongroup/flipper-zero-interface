@@ -177,46 +177,48 @@ def parse_ir_output(raw: str) -> list[dict]:
     """
     Parse ir rx output into structured signal data.
 
-    Decoded signals typically look like:
+    The Flipper CLI outputs signals in compact format:
+      NEC, A:0x04, C:0x08
+      NEC, A:0x04, C:0x08 R       (R = repeat)
+      Samsung32, A:0x07, C:0xE0
+    Also handles verbose format (older firmware / docs):
       Protocol: NEC Address: 04 Command: 08
-    or multi-line:
-      Protocol: NEC
-      Address: 04
-      Command: 08
     """
     signals = []
-    current = {}
 
     for line in raw.split("\n"):
         line = line.strip()
 
         # Skip status/info lines
-        if not line or "Waiting" in line or "IR receiver" in line:
+        if not line or "Receiving" in line or "Press Ctrl" in line:
             continue
-        if "Press CTRL" in line or "Receiving" in line:
+        if line.startswith(">") or "INFRARED" in line:
             continue
 
+        # Compact format: "NEC, A:0x04, C:0x08" or "NEC, A:0x04, C:0x08 R"
+        compact = re.match(
+            r"^(\w+),\s*A:(0x[0-9A-Fa-f]+),\s*C:(0x[0-9A-Fa-f]+)(\s+R)?$",
+            line,
+        )
+        if compact:
+            signals.append({
+                "protocol": compact.group(1),
+                "address": compact.group(2),
+                "command": compact.group(3),
+                "repeat": bool(compact.group(4)),
+            })
+            continue
+
+        # Verbose format: "Protocol: NEC Address: 04 Command: 08"
         proto_match = re.search(r"Protocol:\s*(\S+)", line)
-        addr_match = re.search(r"Address:\s*([0-9A-Fa-f\s]+?)(?:\s+\w+:|$)", line)
-        cmd_match = re.search(r"Command:\s*([0-9A-Fa-f\s]+?)(?:\s+\w+:|$)", line)
-
         if proto_match:
-            if current.get("protocol"):
-                signals.append(current)
-                current = {}
-
-            current["protocol"] = proto_match.group(1)
+            sig = {"protocol": proto_match.group(1)}
+            addr_match = re.search(r"Address:\s*([0-9A-Fa-fx\s]+?)(?:\s+\w+:|$)", line)
+            cmd_match = re.search(r"Command:\s*([0-9A-Fa-fx\s]+?)(?:\s+\w+:|$)", line)
             if addr_match:
-                current["address"] = addr_match.group(1).strip()
+                sig["address"] = addr_match.group(1).strip()
             if cmd_match:
-                current["command"] = cmd_match.group(1).strip()
-
-        elif addr_match and current:
-            current["address"] = addr_match.group(1).strip()
-        elif cmd_match and current:
-            current["command"] = cmd_match.group(1).strip()
-
-    if current.get("protocol"):
-        signals.append(current)
+                sig["command"] = cmd_match.group(1).strip()
+            signals.append(sig)
 
     return signals

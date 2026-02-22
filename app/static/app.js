@@ -880,8 +880,9 @@ function renderIrSignals(data) {
         </div>`;
     } else {
         data.signals.forEach((sig) => {
+            const repeatTag = sig.repeat ? ' <span style="color: var(--text-dim); font-size: 11px;">(repeat)</span>' : '';
             html += `<div class="signal-card">
-                <div class="signal-protocol">${esc(sig.protocol)}</div>
+                <div class="signal-protocol">${esc(sig.protocol)}${repeatTag}</div>
                 <div class="signal-details">`;
             if (sig.address) html += `<div><span class="label">Address:</span> <span class="signal-key">${esc(sig.address)}</span></div>`;
             if (sig.command) html += `<div><span class="label">Command:</span> <span class="signal-key">${esc(sig.command)}</span></div>`;
