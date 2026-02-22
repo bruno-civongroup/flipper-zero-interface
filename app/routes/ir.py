@@ -1,4 +1,8 @@
-"""Infrared endpoints — learn, transmit, and universal remote control."""
+"""Infrared endpoints — learn, transmit, universal remote, and signal library."""
+
+import json
+import uuid
+from pathlib import Path
 
 from fastapi import APIRouter, HTTPException
 from pydantic import BaseModel
@@ -6,6 +10,19 @@ from app.serial_manager import flipper
 import re
 
 router = APIRouter(prefix="/api/ir", tags=["ir"])
+
+# Persistent signal library — stored alongside the app
+SIGNALS_FILE = Path(__file__).parent.parent.parent / "signals.json"
+
+
+def _load_signals() -> list[dict]:
+    if SIGNALS_FILE.exists():
+        return json.loads(SIGNALS_FILE.read_text())
+    return []
+
+
+def _save_signals(signals: list[dict]):
+    SIGNALS_FILE.write_text(json.dumps(signals, indent=2))
 
 # Supported IR protocols on the Flipper Zero
 IR_PROTOCOLS = [
@@ -169,6 +186,77 @@ async def list_saved():
         entries = await file_manager.list_directory("/ext/infrared")
         files = [e for e in entries if e["type"] == "file"]
         return {"files": files, "count": len(files)}
+    except ConnectionError as e:
+        raise HTTPException(status_code=503, detail=str(e))
+
+
+# ── Signal Library (persistent local storage) ──
+
+class SaveSignalRequest(BaseModel):
+    name: str
+    protocol: str
+    address: str
+    command: str
+
+
+@router.get("/signals")
+async def get_signals():
+    """List all saved signals from the local library."""
+    signals = _load_signals()
+    return {"signals": signals, "count": len(signals)}
+
+
+@router.post("/signals")
+async def save_signal(req: SaveSignalRequest):
+    """Save a signal to the local library."""
+    signals = _load_signals()
+    sig = {
+        "id": str(uuid.uuid4())[:8],
+        "name": req.name.strip(),
+        "protocol": req.protocol,
+        "address": req.address,
+        "command": req.command,
+    }
+    signals.append(sig)
+    _save_signals(signals)
+    return sig
+
+
+@router.delete("/signals/{signal_id}")
+async def delete_signal(signal_id: str):
+    """Delete a signal from the local library."""
+    signals = _load_signals()
+    before = len(signals)
+    signals = [s for s in signals if s["id"] != signal_id]
+    if len(signals) == before:
+        raise HTTPException(status_code=404, detail="Signal not found")
+    _save_signals(signals)
+    return {"deleted": signal_id}
+
+
+@router.post("/signals/{signal_id}/transmit")
+async def transmit_saved(signal_id: str):
+    """Transmit a saved signal from the library."""
+    if not flipper.connected:
+        raise HTTPException(status_code=503, detail="Flipper not connected")
+
+    signals = _load_signals()
+    sig = next((s for s in signals if s["id"] == signal_id), None)
+    if not sig:
+        raise HTTPException(status_code=404, detail="Signal not found")
+
+    try:
+        result = await flipper.send_command(
+            f"ir tx {sig['protocol']} {sig['address']} {sig['command']}",
+            timeout=5.0,
+        )
+        return {
+            "name": sig["name"],
+            "protocol": sig["protocol"],
+            "address": sig["address"],
+            "command": sig["command"],
+            "result": result,
+        }
     except ConnectionError as e:
         raise HTTPException(status_code=503, detail=str(e))
 

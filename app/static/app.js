@@ -262,6 +262,7 @@ document.querySelectorAll(".tab").forEach((tab) => {
 
         // Update marauder status when switching to WiFi tab
         if (target === "wifi") updateMarauderStatus();
+        if (target === "ir") loadSavedSignals();
 
         if (target === "terminal") terminalInput.focus();
     });
@@ -879,19 +880,35 @@ function renderIrSignals(data) {
             <span style="font-size: 11px; color: var(--text-dim);">Point a remote directly at the Flipper's IR receiver and press a button during the learn window.</span>
         </div>`;
     } else {
-        data.signals.forEach((sig) => {
-            const repeatTag = sig.repeat ? ' <span style="color: var(--text-dim); font-size: 11px;">(repeat)</span>' : '';
+        // Deduplicate: skip repeats, keep only unique protocol+address+command
+        const seen = new Set();
+        const unique = data.signals.filter((sig) => {
+            if (sig.repeat) return false;
+            const key = `${sig.protocol}|${sig.address}|${sig.command}`;
+            if (seen.has(key)) return false;
+            seen.add(key);
+            return true;
+        });
+
+        unique.forEach((sig, i) => {
+            const sigJson = JSON.stringify({ protocol: sig.protocol, address: sig.address || "", command: sig.command || "" });
             html += `<div class="signal-card">
-                <div class="signal-protocol">${esc(sig.protocol)}${repeatTag}</div>
+                <div class="signal-protocol">${esc(sig.protocol)}</div>
                 <div class="signal-details">`;
             if (sig.address) html += `<div><span class="label">Address:</span> <span class="signal-key">${esc(sig.address)}</span></div>`;
             if (sig.command) html += `<div><span class="label">Command:</span> <span class="signal-key">${esc(sig.command)}</span></div>`;
             html += `</div>
-                <div style="margin-top: 8px;">
+                <div style="margin-top: 8px; display: flex; gap: 6px; align-items: center;">
                     <button class="btn btn-sm btn-primary" onclick="fillIrTransmit('${esc(sig.protocol)}','${esc(sig.address || "")}','${esc(sig.command || "")}')">Use for Transmit</button>
+                    <input type="text" class="port-select" id="irSaveName${i}" placeholder="Name (e.g. TV Power)" style="width: 160px; min-width: 100px; margin-bottom: 0; padding: 4px 8px; font-size: 12px;">
+                    <button class="btn btn-sm btn-primary" onclick="saveIrSignal(${i}, ${esc(sigJson)})">Save</button>
                 </div>
             </div>`;
         });
+
+        if (unique.length < data.signals.length) {
+            html += `<div style="font-size: 11px; color: var(--text-dim); margin-top: 4px;">${data.signals.length - unique.length} repeat(s) filtered</div>`;
+        }
     }
 
     html += `<details style="margin-top: 12px; font-size: 12px; color: var(--text-dim);">
@@ -902,8 +919,83 @@ function renderIrSignals(data) {
     irResults.innerHTML = html;
 }
 
+async function saveIrSignal(index, sigData) {
+    const nameInput = document.getElementById(`irSaveName${index}`);
+    const name = nameInput ? nameInput.value.trim() : "";
+    if (!name) {
+        nameInput.style.borderColor = "var(--red)";
+        nameInput.focus();
+        return;
+    }
+
+    try {
+        await api("/api/ir/signals", {
+            method: "POST",
+            body: JSON.stringify({
+                name,
+                protocol: sigData.protocol,
+                address: sigData.address,
+                command: sigData.command,
+            }),
+        });
+        nameInput.style.borderColor = "var(--green)";
+        nameInput.value = "Saved!";
+        nameInput.disabled = true;
+        loadSavedSignals();
+    } catch (e) {
+        nameInput.style.borderColor = "var(--red)";
+    }
+}
+
+async function loadSavedSignals() {
+    const container = document.getElementById("irSavedSignals");
+    try {
+        const data = await api("/api/ir/signals");
+        if (data.signals.length === 0) {
+            container.innerHTML = '<div style="color: var(--text-dim); font-size: 12px; padding: 8px;">No saved signals yet. Capture a signal and click Save.</div>';
+            return;
+        }
+        let html = "";
+        data.signals.forEach((sig) => {
+            html += `<div class="saved-signal">
+                <button class="btn btn-sm btn-primary saved-signal-play" onclick="replaySignal('${sig.id}')" title="Transmit">&#9654;</button>
+                <div class="saved-signal-info">
+                    <span class="saved-signal-name">${esc(sig.name)}</span>
+                    <span class="saved-signal-detail">${esc(sig.protocol)} ${esc(sig.address)} ${esc(sig.command)}</span>
+                </div>
+                <button class="btn btn-sm btn-danger" onclick="deleteSignal('${sig.id}')" title="Delete">&times;</button>
+            </div>`;
+        });
+        container.innerHTML = html;
+    } catch (e) {
+        container.innerHTML = `<div style="color: var(--red); font-size: 12px; padding: 8px;">${esc(e.message)}</div>`;
+    }
+}
+
+async function replaySignal(id) {
+    try {
+        const data = await api(`/api/ir/signals/${id}/transmit`, { method: "POST" });
+        // Brief flash feedback on the button
+        const btn = document.querySelector(`[onclick="replaySignal('${id}')"]`);
+        if (btn) {
+            btn.textContent = "\u2713";
+            setTimeout(() => { btn.innerHTML = "&#9654;"; }, 600);
+        }
+    } catch (e) {
+        alert(`Transmit failed: ${e.message}`);
+    }
+}
+
+async function deleteSignal(id) {
+    try {
+        await api(`/api/ir/signals/${id}`, { method: "DELETE" });
+        loadSavedSignals();
+    } catch (e) {
+        alert(`Delete failed: ${e.message}`);
+    }
+}
+
 function fillIrTransmit(protocol, address, command) {
-    // Select the protocol in the dropdown if it exists
     for (const opt of irProtocol.options) {
         if (opt.value === protocol) { opt.selected = true; break; }
     }

@@ -730,6 +730,94 @@ header h1 {
     font-size: 11px;
 }
 
+/* ── IR Saved Signals ── */
+.ir-split {
+    flex: 1;
+    display: flex;
+    overflow: hidden;
+}
+
+.ir-saved-panel {
+    width: 220px;
+    min-width: 180px;
+    border-right: 1px solid var(--border);
+    display: flex;
+    flex-direction: column;
+    flex-shrink: 0;
+}
+
+.ir-saved-list {
+    flex: 1;
+    overflow-y: auto;
+    padding: 4px;
+}
+
+.saved-signal {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding: 6px 8px;
+    border-radius: 4px;
+    margin-bottom: 2px;
+}
+
+.saved-signal:hover {
+    background: var(--surface-2);
+}
+
+.saved-signal-play {
+    width: 28px !important;
+    height: 28px;
+    padding: 0 !important;
+    font-size: 12px;
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.saved-signal-info {
+    flex: 1;
+    min-width: 0;
+    overflow: hidden;
+}
+
+.saved-signal-name {
+    display: block;
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--text);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.saved-signal-detail {
+    display: block;
+    font-size: 10px;
+    color: var(--text-dim);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.saved-signal .btn-danger {
+    width: 22px !important;
+    height: 22px;
+    padding: 0 !important;
+    font-size: 14px;
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    opacity: 0;
+    transition: opacity 0.15s;
+}
+
+.saved-signal:hover .btn-danger {
+    opacity: 1;
+}
+
 /* ── Tab bar overflow (8 tabs) ── */
 .tab-bar {
     overflow-x: auto;
