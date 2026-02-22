@@ -232,6 +232,7 @@
                             <option value="audio">Audio</option>
                         </select>
                         <div class="ir-universal-buttons" id="irUniversalButtons"></div>
+                        <button class="btn btn-sm btn-primary" id="irdbOpenBtn" style="margin-left: auto;">Import from IRDB</button>
                     </div>
                 </div>
                 <div class="ir-split">
@@ -300,6 +301,20 @@
                         </span>
                     </div>
                 </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- IRDB Import Modal -->
+    <div class="irdb-overlay" id="irdbOverlay" style="display: none;">
+        <div class="irdb-modal">
+            <div class="irdb-header">
+                <span>Flipper IRDB</span>
+                <button class="btn btn-sm btn-danger" id="irdbCloseBtn">&times;</button>
+            </div>
+            <div class="irdb-breadcrumb" id="irdbBreadcrumb"></div>
+            <div class="irdb-body" id="irdbBody">
+                <div class="scan-status"><span class="spinner"></span> Loading categories...</div>
             </div>
         </div>
     </div>

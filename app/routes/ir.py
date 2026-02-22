@@ -1,9 +1,12 @@
-"""Infrared endpoints — learn, transmit, universal remote, and signal library."""
+"""Infrared endpoints — learn, transmit, universal remote, signal library, and IRDB import."""
 
 import json
+import time
 import uuid
 from pathlib import Path
+from typing import Optional
 
+import httpx
 from fastapi import APIRouter, HTTPException
 from pydantic import BaseModel
 from app.serial_manager import flipper
@@ -259,6 +262,204 @@ async def transmit_saved(signal_id: str):
         }
     except ConnectionError as e:
         raise HTTPException(status_code=503, detail=str(e))
+
+
+# ── IRDB (Flipper-IRDB from GitHub) ──
+
+IRDB_REPO = "Lucaslhm/Flipper-IRDB"
+IRDB_BRANCH = "main"
+_irdb_tree_cache: dict = {"data": None, "time": 0}
+IRDB_CACHE_TTL = 600  # 10 minutes
+
+
+async def _get_irdb_tree() -> list[dict]:
+    """Fetch the full repo tree from GitHub (cached). Returns list of {path, type, size}."""
+    now = time.time()
+    if _irdb_tree_cache["data"] and now - _irdb_tree_cache["time"] < IRDB_CACHE_TTL:
+        return _irdb_tree_cache["data"]
+
+    url = f"https://api.github.com/repos/{IRDB_REPO}/git/trees/{IRDB_BRANCH}?recursive=1"
+    async with httpx.AsyncClient() as client:
+        resp = await client.get(url, headers={"Accept": "application/vnd.github+json"})
+        if resp.status_code != 200:
+            raise HTTPException(status_code=502, detail=f"GitHub API error: {resp.status_code}")
+        data = resp.json()
+
+    tree = [
+        {"path": item["path"], "type": item["type"], "size": item.get("size", 0)}
+        for item in data.get("tree", [])
+        if not item["path"].startswith((".github", "_Converted_"))
+    ]
+    _irdb_tree_cache["data"] = tree
+    _irdb_tree_cache["time"] = now
+    return tree
+
+
+@router.get("/irdb/categories")
+async def irdb_categories():
+    """List top-level IRDB categories (TVs, ACs, Speakers, etc.)."""
+    tree = await _get_irdb_tree()
+    cats = sorted({p["path"].split("/")[0] for p in tree if "/" in p["path"]})
+    return {"categories": cats}
+
+
+@router.get("/irdb/browse")
+async def irdb_browse(path: str = ""):
+    """
+    Browse the IRDB at any level.
+
+    Returns immediate children (directories and .ir files) at the given path.
+    """
+    tree = await _get_irdb_tree()
+    prefix = path.rstrip("/") + "/" if path else ""
+    depth = prefix.count("/") if prefix else 0
+
+    children = []
+    seen = set()
+    for item in tree:
+        if not item["path"].startswith(prefix):
+            continue
+        rest = item["path"][len(prefix):]
+        if not rest:
+            continue
+        # Immediate children only
+        parts = rest.split("/")
+        if item["type"] == "tree" and len(parts) == 1:
+            name = parts[0]
+            if name not in seen:
+                children.append({"name": name, "type": "directory"})
+                seen.add(name)
+        elif item["type"] == "blob" and len(parts) == 1 and rest.endswith(".ir"):
+            children.append({"name": rest, "type": "file", "size": item.get("size", 0)})
+
+    children.sort(key=lambda x: (x["type"] != "directory", x["name"].lower()))
+    return {"path": path, "children": children}
+
+
+@router.get("/irdb/file")
+async def irdb_file(path: str):
+    """Fetch and parse an .ir file from the IRDB. Returns parsed signals."""
+    if not path.endswith(".ir"):
+        raise HTTPException(status_code=400, detail="Not an .ir file")
+
+    url = f"https://raw.githubusercontent.com/{IRDB_REPO}/{IRDB_BRANCH}/{path}"
+    async with httpx.AsyncClient() as client:
+        resp = await client.get(url)
+        if resp.status_code != 200:
+            raise HTTPException(status_code=404, detail="File not found in IRDB")
+        content = resp.text
+
+    signals = parse_ir_file(content)
+    return {
+        "path": path,
+        "filename": path.split("/")[-1],
+        "signals": signals,
+        "count": len(signals),
+    }
+
+
+class IrdbImportRequest(BaseModel):
+    signals: list[dict]  # Each: {name, protocol, address, command}
+
+
+@router.post("/irdb/import")
+async def irdb_import(req: IrdbImportRequest):
+    """Import signals from IRDB into the local library."""
+    library = _load_signals()
+    imported = []
+    for sig in req.signals:
+        name = sig.get("name", "").strip()
+        protocol = sig.get("protocol", "")
+        address = sig.get("address", "")
+        command = sig.get("command", "")
+        if not name or not protocol:
+            continue
+        entry = {
+            "id": str(uuid.uuid4())[:8],
+            "name": name,
+            "protocol": protocol,
+            "address": address,
+            "command": command,
+        }
+        library.append(entry)
+        imported.append(entry)
+    _save_signals(library)
+    return {"imported": len(imported), "signals": imported}
+
+
+def parse_ir_file(content: str) -> list[dict]:
+    """
+    Parse a Flipper .ir file into a list of signal dicts.
+
+    Handles both 'parsed' (decoded protocol) and 'raw' (timing data) types.
+    Parsed signals get protocol/address/command extracted.
+    Raw signals get frequency/duty_cycle noted but are marked as raw.
+
+    Address/command in .ir files use "07 00 00 00" format (space-separated
+    little-endian bytes). We convert to "0x07" style for consistency with
+    the Flipper CLI `ir tx` command.
+    """
+    signals = []
+    current: dict = {}
+
+    for line in content.split("\n"):
+        line = line.strip()
+
+        if not line or line.startswith("#") or line.startswith("Filetype:") or line.startswith("Version:"):
+            # End of a signal block — save if we have one
+            if current.get("name"):
+                signals.append(current)
+                current = {}
+            continue
+
+        if line.startswith("name: "):
+            if current.get("name"):
+                signals.append(current)
+            current = {"name": line[6:].strip()}
+        elif line.startswith("type: "):
+            current["type"] = line[6:].strip()
+        elif line.startswith("protocol: "):
+            current["protocol"] = line[10:].strip()
+        elif line.startswith("address: "):
+            raw_addr = line[9:].strip()
+            current["address"] = _ir_bytes_to_hex(raw_addr)
+            current["address_raw"] = raw_addr
+        elif line.startswith("command: "):
+            raw_cmd = line[9:].strip()
+            current["command"] = _ir_bytes_to_hex(raw_cmd)
+            current["command_raw"] = raw_cmd
+        elif line.startswith("frequency: "):
+            current["frequency"] = int(line[11:].strip())
+        elif line.startswith("duty_cycle: "):
+            current["duty_cycle"] = float(line[12:].strip())
+        elif line.startswith("data: "):
+            current["raw_data"] = line[6:].strip()
+
+    # Don't forget the last signal
+    if current.get("name"):
+        signals.append(current)
+
+    return signals
+
+
+def _ir_bytes_to_hex(raw: str) -> str:
+    """
+    Convert .ir file address/command format to CLI-compatible hex.
+
+    .ir format: "07 00 00 00" (space-separated bytes, little-endian, zero-padded to 4 bytes)
+    CLI format: "0x07" (compact hex prefix)
+
+    Strips trailing zero bytes and converts to 0x-prefixed hex.
+    """
+    parts = raw.split()
+    # Strip trailing 00 bytes
+    while len(parts) > 1 and parts[-1] == "00":
+        parts.pop()
+    # Reverse for big-endian reading and join
+    hex_str = "".join(parts[::-1])
+    # Remove leading zeros but keep at least one digit
+    hex_str = hex_str.lstrip("0") or "0"
+    return f"0x{hex_str}"
 
 
 def parse_ir_output(raw: str) -> list[dict]:

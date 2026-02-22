@@ -995,6 +995,163 @@ async function deleteSignal(id) {
     }
 }
 
+// ── IRDB Browser ──
+const irdbOverlay = document.getElementById("irdbOverlay");
+const irdbBody = document.getElementById("irdbBody");
+const irdbBreadcrumb = document.getElementById("irdbBreadcrumb");
+let irdbCurrentPath = "";
+
+document.getElementById("irdbOpenBtn").addEventListener("click", () => {
+    irdbOverlay.style.display = "flex";
+    irdbBrowse("");
+});
+
+document.getElementById("irdbCloseBtn").addEventListener("click", () => {
+    irdbOverlay.style.display = "none";
+});
+
+irdbOverlay.addEventListener("click", (e) => {
+    if (e.target === irdbOverlay) irdbOverlay.style.display = "none";
+});
+
+function irdbRenderBreadcrumb(path) {
+    let html = '<a onclick="irdbBrowse(\'\')">IRDB</a>';
+    if (path) {
+        const parts = path.split("/");
+        let cumulative = "";
+        parts.forEach((p) => {
+            cumulative += (cumulative ? "/" : "") + p;
+            const full = cumulative;
+            html += ` / <a onclick="irdbBrowse('${full}')">${p}</a>`;
+        });
+    }
+    irdbBreadcrumb.innerHTML = html;
+}
+
+async function irdbBrowse(path) {
+    irdbCurrentPath = path;
+    irdbRenderBreadcrumb(path);
+    irdbBody.innerHTML = '<div class="scan-status"><span class="spinner"></span> Loading...</div>';
+
+    try {
+        const data = await api(`/api/ir/irdb/browse?path=${encodeURIComponent(path)}`);
+        if (data.children.length === 0) {
+            irdbBody.innerHTML = '<div class="info-placeholder">Empty directory</div>';
+            return;
+        }
+        let html = "";
+        data.children.forEach((item) => {
+            if (item.type === "directory") {
+                const full = path ? path + "/" + item.name : item.name;
+                html += `<div class="irdb-item" onclick="irdbBrowse('${full}')">
+                    <span class="icon">\u{1F4C1}</span>
+                    <span>${esc(item.name.replace(/_/g, " "))}</span>
+                </div>`;
+            } else {
+                const full = path ? path + "/" + item.name : item.name;
+                const sizeStr = item.size ? `${(item.size / 1024).toFixed(1)} KB` : "";
+                html += `<div class="irdb-item" onclick="irdbOpenFile('${full}')">
+                    <span class="icon">\u{1F4E1}</span>
+                    <span>${esc(item.name.replace(/_/g, " ").replace(".ir", ""))}</span>
+                    <span class="size">${sizeStr}</span>
+                </div>`;
+            }
+        });
+        irdbBody.innerHTML = html;
+    } catch (e) {
+        irdbBody.innerHTML = `<div class="info-placeholder" style="color: var(--red)">${esc(e.message)}</div>`;
+    }
+}
+
+async function irdbOpenFile(path) {
+    irdbRenderBreadcrumb(path);
+    irdbBody.innerHTML = '<div class="scan-status"><span class="spinner"></span> Fetching signals...</div>';
+
+    try {
+        const data = await api(`/api/ir/irdb/file?path=${encodeURIComponent(path)}`);
+        const parsed = data.signals.filter((s) => s.type === "parsed");
+        const raw = data.signals.filter((s) => s.type === "raw");
+
+        let html = `<div style="font-size: 12px; color: var(--text-dim); padding: 4px 12px; margin-bottom: 4px;">
+            ${data.count} signal(s) &mdash; ${parsed.length} decoded, ${raw.length} raw
+        </div>`;
+
+        if (parsed.length > 0) {
+            html += `<div style="padding: 4px 12px; margin-bottom: 4px;">
+                <label style="font-size: 12px; cursor: pointer; color: var(--text-dim);">
+                    <input type="checkbox" id="irdbSelectAll" onchange="irdbToggleAll(this.checked)" checked> Select all decoded
+                </label>
+            </div>`;
+            parsed.forEach((sig, i) => {
+                html += `<div class="irdb-signal">
+                    <input type="checkbox" class="irdb-check" data-index="${i}" checked>
+                    <span class="sig-name">${esc(sig.name)}</span>
+                    <span class="sig-detail">${esc(sig.protocol)} ${esc(sig.address)} ${esc(sig.command)}</span>
+                </div>`;
+            });
+        }
+
+        if (raw.length > 0) {
+            html += `<div style="padding: 8px 12px; margin-top: 8px; font-size: 11px; color: var(--text-dim);">
+                ${raw.length} raw signal(s) (not importable — raw timing data without decoded protocol)
+            </div>`;
+            raw.forEach((sig) => {
+                html += `<div class="irdb-signal" style="opacity: 0.5;">
+                    <span class="sig-name">${esc(sig.name)}</span>
+                    <span class="sig-raw-tag">raw ${sig.frequency ? sig.frequency + " Hz" : ""}</span>
+                </div>`;
+            });
+        }
+
+        if (parsed.length > 0) {
+            html += `<div class="irdb-actions">
+                <button class="btn btn-sm btn-primary" onclick="irdbImportSelected()">Import Selected</button>
+                <span id="irdbImportStatus" style="font-size: 12px; color: var(--text-dim);"></span>
+            </div>`;
+        }
+
+        irdbBody.innerHTML = html;
+        // Store parsed signals for import
+        irdbBody._parsedSignals = parsed;
+    } catch (e) {
+        irdbBody.innerHTML = `<div class="info-placeholder" style="color: var(--red)">${esc(e.message)}</div>`;
+    }
+}
+
+function irdbToggleAll(checked) {
+    document.querySelectorAll(".irdb-check").forEach((cb) => { cb.checked = checked; });
+}
+
+async function irdbImportSelected() {
+    const parsed = irdbBody._parsedSignals || [];
+    const checks = document.querySelectorAll(".irdb-check");
+    const selected = [];
+    checks.forEach((cb) => {
+        if (cb.checked) {
+            const sig = parsed[parseInt(cb.dataset.index)];
+            if (sig) selected.push({ name: sig.name, protocol: sig.protocol, address: sig.address, command: sig.command });
+        }
+    });
+
+    if (selected.length === 0) return;
+
+    const status = document.getElementById("irdbImportStatus");
+    status.textContent = "Importing...";
+
+    try {
+        const data = await api("/api/ir/irdb/import", {
+            method: "POST",
+            body: JSON.stringify({ signals: selected }),
+        });
+        status.style.color = "var(--green)";
+        status.textContent = `Imported ${data.imported} signal(s)`;
+        loadSavedSignals();
+    } catch (e) {
+        status.style.color = "var(--red)";
+        status.textContent = `Failed: ${e.message}`;
+    }
+}
+
 function fillIrTransmit(protocol, address, command) {
     for (const opt of irProtocol.options) {
         if (opt.value === protocol) { opt.selected = true; break; }
