@@ -282,65 +282,6 @@ class FlipperSerial:
             text = _re.sub(r"\x1b\[[0-9;]*m", "", text)
             return text.strip()
 
-    async def capture_screen_frame(self, timeout: float = 3.0) -> bytes:
-        """
-        Capture a single screen frame from the Flipper's LCD.
-
-        Sends `gui screenframe`, reads binary frame data (1024 bytes for
-        128x64 1-bit display), then sends Ctrl+C to stop.
-
-        The Flipper screen is 128x64 pixels in page-based format:
-        8 pages x 128 columns, each byte = 8 vertical pixels (LSB = top).
-
-        Returns raw 1024 bytes of frame data, or empty bytes on failure.
-        """
-        if not self.connected:
-            raise ConnectionError("Not connected to Flipper Zero")
-
-        async with self._lock:
-            # Flush input buffer
-            self._port.read(self._port.in_waiting or 0)
-
-            # Send screenframe command
-            self._port.write(b"gui screenframe\r\n")
-
-            # Read response: first comes the text echo, then 1024 bytes of binary data
-            response = b""
-            deadline = asyncio.get_event_loop().time() + timeout
-            while asyncio.get_event_loop().time() < deadline:
-                waiting = self._port.in_waiting
-                if waiting:
-                    response += self._port.read(waiting)
-                    # We need the echo line + 1024 binary bytes
-                    # Find the end of the echo line (after \r\n)
-                    newline_pos = response.find(b"\r\n")
-                    if newline_pos >= 0:
-                        binary_start = newline_pos + 2
-                        binary_data = response[binary_start:]
-                        if len(binary_data) >= 1024:
-                            frame = binary_data[:1024]
-                            # Send Ctrl+C to stop and drain
-                            self._port.write(b"\x03")
-                            await asyncio.sleep(0.1)
-                            self._port.read(self._port.in_waiting or 0)
-                            # Wait for prompt to return
-                            drain_deadline = asyncio.get_event_loop().time() + 1.0
-                            while asyncio.get_event_loop().time() < drain_deadline:
-                                w = self._port.in_waiting
-                                if w:
-                                    d = self._port.read(w)
-                                    if self.PROMPT in d:
-                                        break
-                                await asyncio.sleep(0.05)
-                            return frame
-                await asyncio.sleep(0.02)
-
-            # Timeout — send Ctrl+C and drain
-            self._port.write(b"\x03")
-            await asyncio.sleep(0.1)
-            self._port.read(self._port.in_waiting or 0)
-            return b""
-
     async def run_js(self, script_path: str, timeout: float = 30.0) -> str:
         """
         Run a JS script on the Flipper and return its printed output.

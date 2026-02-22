@@ -1032,6 +1032,17 @@ let screenWs = null;
 
 screenCtx.imageSmoothingEnabled = false;
 
+let screenMirroring = false;
+
+function setScreenMirrorUI(active) {
+    screenMirroring = active;
+    screenStartBtn.disabled = active;
+    screenStopBtn.disabled = !active;
+    screenStatusDot.className = "status-dot" + (active ? " connected" : "");
+    screenStatusText.textContent = active ? "Streaming (CLI paused)" : "Stopped";
+    if (!active) screenFps.textContent = "";
+}
+
 function startScreenMirror() {
     if (screenWs) return;
     const proto = location.protocol === "https:" ? "wss" : "ws";
@@ -1039,10 +1050,7 @@ function startScreenMirror() {
 
     screenWs.onopen = () => {
         screenWs.send(JSON.stringify({ action: "start" }));
-        screenStartBtn.disabled = true;
-        screenStopBtn.disabled = false;
-        screenStatusDot.className = "status-dot connected";
-        screenStatusText.textContent = "Streaming";
+        setScreenMirrorUI(true);
         screenCanvas.style.display = "block";
         screenPlaceholder.style.display = "none";
     };
@@ -1062,38 +1070,31 @@ function startScreenMirror() {
             }
         } else if (msg.type === "error") {
             screenFps.textContent = msg.message;
+        } else if (msg.type === "status" && !msg.streaming) {
+            // Server confirmed stop — now safe to close WebSocket
+            screenWs.close();
         }
     };
 
     screenWs.onclose = () => {
         screenWs = null;
-        screenStartBtn.disabled = false;
-        screenStopBtn.disabled = true;
-        screenStatusDot.className = "status-dot";
-        screenStatusText.textContent = "Stopped";
-        screenFps.textContent = "";
+        setScreenMirrorUI(false);
     };
 
     screenWs.onerror = () => {
         screenWs = null;
-        screenStartBtn.disabled = false;
-        screenStopBtn.disabled = true;
-        screenStatusDot.className = "status-dot";
+        setScreenMirrorUI(false);
         screenStatusText.textContent = "Error";
     };
 }
 
 function stopScreenMirror() {
     if (screenWs && screenWs.readyState === WebSocket.OPEN) {
+        screenStopBtn.disabled = true;
+        screenStatusText.textContent = "Restoring CLI...";
         screenWs.send(JSON.stringify({ action: "stop" }));
-        screenWs.close();
+        // WebSocket closes in onmessage after server confirms stop
     }
-    screenWs = null;
-    screenStartBtn.disabled = false;
-    screenStopBtn.disabled = true;
-    screenStatusDot.className = "status-dot";
-    screenStatusText.textContent = "Stopped";
-    screenFps.textContent = "";
 }
 
 screenStartBtn.addEventListener("click", startScreenMirror);
