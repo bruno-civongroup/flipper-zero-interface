@@ -1,0 +1,747 @@
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+:root {
+    --bg: #0d0d0d;
+    --surface: #1a1a1a;
+    --surface-2: #242424;
+    --border: #333;
+    --text: #e0e0e0;
+    --text-dim: #888;
+    --orange: #ff8c00;
+    --orange-dim: #cc7000;
+    --green: #4caf50;
+    --red: #f44336;
+    --blue: #42a5f5;
+}
+
+body {
+    font-family: 'JetBrains Mono', 'Fira Code', 'Consolas', monospace;
+    background: var(--bg);
+    color: var(--text);
+    min-height: 100vh;
+}
+
+/* ── Header ── */
+header {
+    background: var(--surface);
+    border-bottom: 2px solid var(--orange);
+    padding: 12px 24px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+header h1 {
+    font-size: 18px;
+    font-weight: 600;
+    color: var(--orange);
+    letter-spacing: 1px;
+}
+
+.status-badge {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 13px;
+}
+
+.status-dot {
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    background: var(--red);
+}
+
+.status-dot.connected { background: var(--green); }
+
+/* ── Grid layout ── */
+.main-layout {
+    display: grid;
+    grid-template-columns: 240px 1fr;
+    grid-template-rows: 1fr 1fr;
+    gap: 1px;
+    height: calc(100vh - 50px);
+    background: var(--border);
+}
+
+.panel {
+    background: var(--surface);
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+}
+
+.panel-header {
+    padding: 10px 16px;
+    font-size: 12px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 1.5px;
+    color: var(--orange);
+    border-bottom: 1px solid var(--border);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-shrink: 0;
+}
+
+.panel-body {
+    flex: 1;
+    overflow-y: auto;
+    padding: 12px;
+}
+
+/* ── Sidebar ── */
+.sidebar {
+    grid-row: 1 / -1;
+}
+
+.connect-section {
+    padding: 12px;
+    border-bottom: 1px solid var(--border);
+}
+
+.port-select {
+    width: 100%;
+    padding: 8px;
+    background: var(--surface-2);
+    color: var(--text);
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    font-family: inherit;
+    font-size: 13px;
+    margin-bottom: 8px;
+}
+
+.quick-commands {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.btn {
+    padding: 8px 16px;
+    border: none;
+    border-radius: 4px;
+    font-family: inherit;
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background 0.15s;
+    width: 100%;
+}
+
+.btn-primary {
+    background: var(--orange);
+    color: #000;
+}
+.btn-primary:hover { background: var(--orange-dim); }
+
+.btn-danger {
+    background: var(--red);
+    color: #fff;
+}
+
+.btn-sm {
+    padding: 4px 10px;
+    font-size: 12px;
+    width: auto;
+}
+
+.btn-quick {
+    background: var(--surface-2);
+    color: var(--text-dim);
+    border: 1px solid transparent;
+    text-align: left;
+    padding: 8px 12px;
+    border-radius: 4px;
+    transition: all 0.15s;
+}
+
+.btn-quick:hover {
+    color: var(--text);
+    background: var(--border);
+}
+
+.btn-quick.active {
+    color: var(--orange);
+    border-color: var(--orange);
+    background: rgba(255, 140, 0, 0.08);
+}
+
+.btn-quick.loading {
+    opacity: 0.6;
+    pointer-events: none;
+}
+
+/* ── Info Panel (top right) ── */
+.info-panel {
+    grid-column: 2;
+    grid-row: 1;
+}
+
+.info-output {
+    flex: 1;
+    overflow-y: auto;
+    padding: 16px;
+    font-size: 13px;
+    line-height: 1.7;
+}
+
+.info-placeholder {
+    color: var(--text-dim);
+    font-style: italic;
+}
+
+.info-table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.info-table tr {
+    border-bottom: 1px solid var(--border);
+}
+
+.info-table td {
+    padding: 6px 8px;
+    vertical-align: top;
+}
+
+.info-table td:first-child {
+    color: var(--text);
+    font-weight: 600;
+    white-space: nowrap;
+    width: 1%;
+    padding-right: 16px;
+}
+
+.info-table td:last-child {
+    color: var(--text-dim);
+    word-break: break-all;
+}
+
+.info-raw {
+    white-space: pre-wrap;
+    word-break: break-all;
+    color: var(--text-dim);
+}
+
+/* ── Bottom Panel (tabbed) ── */
+.bottom-panel {
+    grid-column: 2;
+    grid-row: 2;
+}
+
+.tab-bar {
+    display: flex;
+    align-items: center;
+    border-bottom: 1px solid var(--border);
+    flex-shrink: 0;
+}
+
+.tab {
+    padding: 10px 20px;
+    font-family: inherit;
+    font-size: 12px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    color: var(--text-dim);
+    background: none;
+    border: none;
+    border-bottom: 2px solid transparent;
+    cursor: pointer;
+    transition: all 0.15s;
+}
+
+.tab:hover { color: var(--text); }
+
+.tab.active {
+    color: var(--orange);
+    border-bottom-color: var(--orange);
+}
+
+.tab-actions {
+    margin-left: auto;
+    padding: 0 12px;
+}
+
+.tab-content {
+    display: none;
+    flex: 1;
+    flex-direction: column;
+    overflow: hidden;
+}
+
+.tab-content.active {
+    display: flex;
+}
+
+/* ── Terminal ── */
+.terminal-output {
+    flex: 1;
+    overflow-y: auto;
+    padding: 12px;
+    font-size: 13px;
+    line-height: 1.6;
+    white-space: pre-wrap;
+    word-break: break-all;
+}
+
+.terminal-output .cmd { color: var(--orange); }
+.terminal-output .resp { color: var(--text-dim); }
+.terminal-output .err { color: var(--red); }
+.terminal-output .sys { color: var(--blue); font-style: italic; }
+
+.terminal-input {
+    display: flex;
+    border-top: 1px solid var(--border);
+    flex-shrink: 0;
+}
+
+.terminal-input span {
+    padding: 10px 12px;
+    color: var(--orange);
+    font-size: 14px;
+    font-weight: bold;
+    background: var(--surface-2);
+}
+
+.terminal-input input {
+    flex: 1;
+    padding: 10px 12px;
+    background: var(--surface-2);
+    color: var(--text);
+    border: none;
+    font-family: inherit;
+    font-size: 13px;
+    outline: none;
+}
+
+/* ── File Browser ── */
+.files-body {
+    flex: 1;
+    overflow-y: auto;
+    padding: 12px;
+}
+
+.breadcrumb {
+    font-size: 12px;
+    color: var(--text-dim);
+    padding: 8px 0;
+    display: flex;
+    align-items: center;
+    gap: 4px;
+}
+
+.breadcrumb a {
+    color: var(--orange);
+    text-decoration: none;
+    cursor: pointer;
+}
+
+.file-list {
+    list-style: none;
+}
+
+.file-list li {
+    padding: 6px 8px;
+    border-radius: 4px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 13px;
+}
+
+.file-list li:hover {
+    background: var(--surface-2);
+}
+
+.file-list .icon {
+    width: 18px;
+    text-align: center;
+    color: var(--orange);
+}
+
+.file-list .size {
+    margin-left: auto;
+    color: var(--text-dim);
+    font-size: 11px;
+}
+
+.upload-zone {
+    border: 2px dashed var(--border);
+    border-radius: 8px;
+    padding: 20px;
+    text-align: center;
+    color: var(--text-dim);
+    font-size: 13px;
+    margin-top: 12px;
+    cursor: pointer;
+    transition: border-color 0.2s;
+}
+
+.upload-zone:hover,
+.upload-zone.dragover {
+    border-color: var(--orange);
+    color: var(--text);
+}
+
+/* ── WiFi Scanner ── */
+.wifi-toolbar {
+    padding: 10px 12px;
+    border-bottom: 1px solid var(--border);
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    flex-shrink: 0;
+}
+
+.wifi-connection {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.wifi-connection .port-select {
+    width: auto;
+    min-width: 140px;
+    margin-bottom: 0;
+}
+
+.wifi-actions {
+    display: flex;
+    gap: 6px;
+}
+
+.wifi-results {
+    flex: 1;
+    overflow-y: auto;
+    padding: 12px;
+}
+
+.wifi-results .info-placeholder {
+    color: var(--text-dim);
+    font-style: italic;
+    font-size: 13px;
+    text-align: center;
+    padding: 40px 20px;
+}
+
+.ap-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 12px;
+}
+
+.ap-table th {
+    text-align: left;
+    padding: 8px 10px;
+    color: var(--orange);
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    border-bottom: 2px solid var(--border);
+    position: sticky;
+    top: 0;
+    background: var(--surface);
+    cursor: pointer;
+    user-select: none;
+}
+
+.ap-table th:hover {
+    color: var(--text);
+}
+
+.ap-table td {
+    padding: 6px 10px;
+    border-bottom: 1px solid var(--border);
+    color: var(--text-dim);
+}
+
+.ap-table tr:hover td {
+    background: var(--surface-2);
+    color: var(--text);
+}
+
+.ap-table .ssid { color: var(--text); font-weight: 600; }
+.ap-table .bssid { font-size: 11px; }
+
+.rssi-bar {
+    display: inline-block;
+    height: 8px;
+    border-radius: 2px;
+    min-width: 4px;
+}
+
+.rssi-excellent { background: var(--green); }
+.rssi-good { background: #8bc34a; }
+.rssi-fair { background: var(--orange); }
+.rssi-weak { background: var(--red); }
+
+.scan-status {
+    padding: 12px;
+    text-align: center;
+    color: var(--blue);
+    font-style: italic;
+    font-size: 13px;
+}
+
+.scan-status .spinner {
+    display: inline-block;
+    width: 14px;
+    height: 14px;
+    border: 2px solid var(--border);
+    border-top-color: var(--orange);
+    border-radius: 50%;
+    animation: spin 0.8s linear infinite;
+    vertical-align: middle;
+    margin-right: 8px;
+}
+
+@keyframes spin {
+    to { transform: rotate(360deg); }
+}
+
+/* ── Sub-GHz ── */
+.signal-card {
+    background: var(--surface-2);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    padding: 12px 16px;
+    margin-bottom: 8px;
+}
+
+.signal-card .signal-protocol {
+    color: var(--orange);
+    font-weight: 600;
+    font-size: 14px;
+    margin-bottom: 6px;
+}
+
+.signal-card .signal-details {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+    gap: 4px 16px;
+    font-size: 12px;
+}
+
+.signal-card .signal-details .label {
+    color: var(--text);
+    font-weight: 600;
+}
+
+.signal-card .signal-details .value {
+    color: var(--text-dim);
+    font-family: inherit;
+}
+
+.signal-key {
+    background: var(--bg);
+    border: 1px solid var(--border);
+    border-radius: 3px;
+    padding: 2px 6px;
+    font-size: 12px;
+    color: var(--green);
+    letter-spacing: 1px;
+}
+
+.no-signals {
+    text-align: center;
+    padding: 30px;
+    color: var(--text-dim);
+    font-size: 13px;
+}
+
+/* ── NFC/RFID ── */
+.tag-card {
+    background: var(--surface-2);
+    border: 1px solid var(--border);
+    border-left: 3px solid var(--blue);
+    border-radius: 6px;
+    padding: 12px 16px;
+    margin-bottom: 8px;
+}
+
+.tag-card .tag-type {
+    color: var(--blue);
+    font-weight: 600;
+    font-size: 14px;
+    margin-bottom: 6px;
+}
+
+.tag-card .tag-uid {
+    background: var(--bg);
+    border: 1px solid var(--border);
+    border-radius: 3px;
+    padding: 4px 8px;
+    font-size: 13px;
+    color: var(--green);
+    letter-spacing: 2px;
+    display: inline-block;
+    margin-bottom: 6px;
+}
+
+.tag-card .tag-details {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+    gap: 4px 16px;
+    font-size: 12px;
+}
+
+.tag-card .tag-details .label { color: var(--text); font-weight: 600; }
+.tag-card .tag-details .value { color: var(--text-dim); }
+
+/* ── Remote Control (D-pad) ── */
+.remote-body {
+    flex: 1;
+    overflow-y: auto;
+    padding: 16px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.dpad-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 12px;
+}
+
+.dpad-grid {
+    display: grid;
+    grid-template-columns: 64px 64px 64px;
+    grid-template-rows: 64px 64px 64px;
+    gap: 4px;
+}
+
+.dpad-btn {
+    width: 64px;
+    height: 64px;
+    font-size: 20px;
+    font-weight: 700;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: var(--surface-2);
+    color: var(--text);
+    border: 2px solid var(--border);
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.1s;
+    user-select: none;
+    -webkit-user-select: none;
+}
+
+.dpad-btn:hover {
+    background: var(--border);
+    border-color: var(--orange);
+}
+
+.dpad-btn:active,
+.dpad-btn.pressed {
+    background: var(--orange);
+    color: #000;
+    border-color: var(--orange);
+    transform: scale(0.95);
+}
+
+.dpad-ok {
+    background: var(--orange-dim);
+    color: #000;
+    font-size: 14px;
+    font-weight: 800;
+    border-color: var(--orange);
+}
+
+.dpad-ok:hover {
+    background: var(--orange);
+}
+
+.dpad-back {
+    width: 140px;
+    height: 40px;
+    font-size: 13px;
+    font-weight: 700;
+    letter-spacing: 1px;
+}
+
+.dpad-spacer {
+    width: 64px;
+    height: 64px;
+}
+
+.remote-log {
+    margin-top: 16px;
+    font-size: 11px;
+    color: var(--text-dim);
+    max-height: 120px;
+    overflow-y: auto;
+    width: 100%;
+    max-width: 300px;
+    text-align: center;
+}
+
+.remote-log div {
+    padding: 2px 0;
+}
+
+/* ── Screen Mirror ── */
+.screen-mirror-body {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 16px;
+    position: relative;
+    overflow: hidden;
+    background: #000;
+}
+
+#screenCanvas {
+    image-rendering: pixelated;
+    image-rendering: crisp-edges;
+    border: 2px solid var(--border);
+    border-radius: 4px;
+    display: none;
+    background: #000;
+}
+
+.screen-placeholder {
+    color: var(--text-dim);
+    font-style: italic;
+    font-size: 13px;
+    text-align: center;
+    padding: 40px 20px;
+}
+
+/* ── IR Universal Buttons ── */
+.ir-universal-buttons {
+    display: flex;
+    gap: 4px;
+    flex-wrap: wrap;
+}
+
+.ir-universal-buttons .btn {
+    width: auto;
+    padding: 4px 8px;
+    font-size: 11px;
+}
+
+/* ── Tab bar overflow (8 tabs) ── */
+.tab-bar {
+    overflow-x: auto;
+    white-space: nowrap;
+}
+
+.tab-bar::-webkit-scrollbar {
+    height: 3px;
+}
+
+/* ── Scrollbar ── */
+::-webkit-scrollbar { width: 6px; }
+::-webkit-scrollbar-track { background: var(--surface); }
+::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
+::-webkit-scrollbar-thumb:hover { background: #555; }
