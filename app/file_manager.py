@@ -61,6 +61,11 @@ async def remove(path: str) -> str:
     return await flipper.send_command(f"storage remove {path}")
 
 
+async def rename(old_path: str, new_path: str) -> str:
+    """Rename/move a file or directory on the Flipper."""
+    return await flipper.send_command(f"storage rename {old_path} {new_path}")
+
+
 async def stat(path: str) -> str:
     """Get file/directory info."""
     return await flipper.send_command(f"storage stat {path}")

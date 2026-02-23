@@ -1,11 +1,28 @@
 """Sub-GHz scanner endpoints using Flipper's built-in CC1101 radio."""
 
+import json
+import uuid
+from pathlib import Path
+
 from fastapi import APIRouter, HTTPException
 from pydantic import BaseModel
 from app.serial_manager import flipper
 import re
 
 router = APIRouter(prefix="/api/subghz", tags=["subghz"])
+
+# Persistent Sub-GHz signal library — stored alongside the app
+SUBGHZ_SIGNALS_FILE = Path(__file__).parent.parent.parent / "subghz_signals.json"
+
+
+def _load_subghz_signals() -> list[dict]:
+    if SUBGHZ_SIGNALS_FILE.exists():
+        return json.loads(SUBGHZ_SIGNALS_FILE.read_text())
+    return []
+
+
+def _save_subghz_signals(signals: list[dict]):
+    SUBGHZ_SIGNALS_FILE.write_text(json.dumps(signals, indent=2))
 
 # Common Sub-GHz frequency presets
 FREQ_PRESETS = {
@@ -122,6 +139,85 @@ async def transmit_from_file(req: TxFileRequest):
             timeout=10.0,
         )
         return {"file": req.file_path, "repeat": req.repeat, "result": result}
+    except ConnectionError as e:
+        raise HTTPException(status_code=503, detail=str(e))
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+
+class SaveSubghzSignalRequest(BaseModel):
+    name: str
+    protocol: str
+    key: str
+    bits: int = 24
+    frequency: int = 433920000
+    te: int | None = None
+
+
+@router.get("/signals")
+async def get_subghz_signals():
+    """List all saved Sub-GHz signals from the local library."""
+    signals = _load_subghz_signals()
+    return {"signals": signals, "count": len(signals)}
+
+
+@router.post("/signals")
+async def save_subghz_signal(req: SaveSubghzSignalRequest):
+    """Save a Sub-GHz signal to the local library."""
+    signals = _load_subghz_signals()
+    sig = {
+        "id": str(uuid.uuid4())[:8],
+        "name": req.name.strip(),
+        "protocol": req.protocol,
+        "key": req.key,
+        "bits": req.bits,
+        "frequency": req.frequency,
+        "te": req.te,
+    }
+    signals.append(sig)
+    _save_subghz_signals(signals)
+    return sig
+
+
+@router.delete("/signals/{signal_id}")
+async def delete_subghz_signal(signal_id: str):
+    """Delete a Sub-GHz signal from the local library."""
+    signals = _load_subghz_signals()
+    before = len(signals)
+    signals = [s for s in signals if s["id"] != signal_id]
+    if len(signals) == before:
+        raise HTTPException(status_code=404, detail="Signal not found")
+    _save_subghz_signals(signals)
+    return {"deleted": signal_id}
+
+
+@router.post("/signals/{signal_id}/transmit")
+async def transmit_subghz_signal(signal_id: str):
+    """Transmit a saved Sub-GHz signal."""
+    if not flipper.connected:
+        raise HTTPException(status_code=503, detail="Flipper not connected")
+
+    signals = _load_subghz_signals()
+    sig = next((s for s in signals if s["id"] == signal_id), None)
+    if not sig:
+        raise HTTPException(status_code=404, detail="Signal not found")
+
+    try:
+        # Format key: ensure 0x prefix and pad to appropriate length
+        key = sig["key"].strip()
+        if not key.startswith("0x") and not key.startswith("0X"):
+            key = "0x" + key.replace(" ", "")
+        result = await flipper.send_command(
+            f"subghz tx {key} {sig['frequency']} {sig.get('te', 400) or 400}",
+            timeout=10.0,
+        )
+        return {
+            "name": sig["name"],
+            "protocol": sig["protocol"],
+            "key": sig["key"],
+            "frequency": sig["frequency"],
+            "result": result,
+        }
     except ConnectionError as e:
         raise HTTPException(status_code=503, detail=str(e))
     except Exception as e:

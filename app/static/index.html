@@ -66,6 +66,8 @@
                 <button class="tab" data-tab="screen">Screen</button>
                 <div class="tab-actions">
                     <button class="btn btn-sm btn-danger" id="clearTermBtn" style="display: inline;">Clear</button>
+                    <button class="btn btn-sm btn-primary" id="exportTermBtn" style="display: none;">Export</button>
+                    <button class="btn btn-sm btn-primary" id="mkdirBtn" style="display: none;">New Folder</button>
                     <button class="btn btn-sm btn-primary" id="refreshFilesBtn" style="display: none;">Refresh</button>
                 </div>
             </div>
@@ -118,13 +120,21 @@
                         <button class="btn btn-sm btn-primary" id="subghzListenRawBtn">Listen RAW</button>
                     </div>
                 </div>
-                <div class="wifi-results" id="subghzResults">
-                    <div class="info-placeholder">
-                        Listen for Sub-GHz signals (remotes, garage doors, weather stations, doorbells).<br><br>
-                        <span style="color: var(--text-dim); font-size: 12px;">
-                            Select a frequency and duration, then click "Listen". Uses the Flipper's built-in CC1101 radio.
-                            Press a remote or trigger a device during the listen window to capture its signal.
-                        </span>
+                <div class="subghz-split">
+                    <div class="wifi-results" id="subghzResults">
+                        <div class="info-placeholder">
+                            Listen for Sub-GHz signals (remotes, garage doors, weather stations, doorbells).<br><br>
+                            <span style="color: var(--text-dim); font-size: 12px;">
+                                Select a frequency and duration, then click "Listen". Uses the Flipper's built-in CC1101 radio.
+                                Press a remote or trigger a device during the listen window to capture its signal.
+                            </span>
+                        </div>
+                    </div>
+                    <div class="subghz-saved-panel">
+                        <div class="panel-header" style="padding: 8px 12px; font-size: 11px;">Saved Signals</div>
+                        <div class="subghz-saved-list" id="subghzSavedSignals">
+                            <div style="color: var(--text-dim); font-size: 12px; padding: 16px; text-align: center;">No saved signals yet.<br><br>Capture signals with Listen, then save them here.</div>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -295,11 +305,11 @@
                     </div>
                 </div>
                 <div class="screen-mirror-body">
-                    <canvas id="screenCanvas" width="512" height="256"></canvas>
+                    <canvas id="screenCanvas"></canvas>
                     <div class="screen-placeholder" id="screenPlaceholder">
                         Click "Start Mirror" to stream the Flipper's LCD screen in real time.<br><br>
                         <span style="color: var(--text-dim); font-size: 12px;">
-                            The display is 128x64 pixels, scaled up 4x. Frame rate is typically 3-5 FPS
+                            The display is 128x64 pixels, auto-scaled to fit. Frame rate is typically 3-5 FPS
                             depending on serial throughput.
                         </span>
                     </div>

@@ -264,11 +264,15 @@ document.querySelectorAll(".tab").forEach((tab) => {
 
         // Switch tab-bar actions
         document.getElementById("clearTermBtn").style.display = target === "terminal" ? "inline" : "none";
+        document.getElementById("exportTermBtn").style.display = target === "terminal" ? "inline" : "none";
+        document.getElementById("mkdirBtn").style.display = target === "files" ? "inline" : "none";
         document.getElementById("refreshFilesBtn").style.display = target === "files" ? "inline" : "none";
 
         // Update marauder status when switching to WiFi tab
         if (target === "wifi") updateMarauderStatus();
         if (target === "ir") loadSavedSignals();
+        if (target === "subghz") loadSubghzLibrary();
+        if (target === "screen") resizeScreenCanvas();
 
         if (target === "terminal") terminalInput.focus();
     });
@@ -289,6 +293,21 @@ function clearTerminal() {
 
 document.getElementById("clearTermBtn").addEventListener("click", clearTerminal);
 
+function exportTerminalLog() {
+    const text = terminalOutput.innerText;
+    if (!text.trim()) return;
+    const blob = new Blob([text], { type: "text/plain" });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    const ts = new Date().toISOString().replace(/[:.]/g, "-").slice(0, 19);
+    a.download = `flipper_terminal_${ts}.log`;
+    a.click();
+    URL.revokeObjectURL(url);
+}
+
+document.getElementById("exportTermBtn").addEventListener("click", exportTerminalLog);
+
 async function runCommand(cmd) {
     if (!cmd.trim()) return;
     appendTerminal("cmd", `> ${cmd}`);
@@ -306,18 +325,151 @@ async function runCommand(cmd) {
     }
 }
 
+// ── Tab Autocomplete ──
+const FLIPPER_COMMANDS = [
+    "bt", "crypto", "date", "free", "gpio", "i2c", "ikey", "info", "input",
+    "ir", "led", "loader", "log", "lfrfid", "nfc", "onewire", "power",
+    "property", "ps", "rfid", "storage", "subghz", "uptime", "vibro",
+];
+let autocompleteMatches = [];
+let autocompleteIndex = -1;
+let autocompletePrefix = "";
+
+function getAutocompleteHint() {
+    let existing = document.getElementById("autocompleteHint");
+    if (!existing) {
+        existing = document.createElement("div");
+        existing.id = "autocompleteHint";
+        existing.className = "autocomplete-hint";
+        terminalInput.parentElement.parentElement.appendChild(existing);
+    }
+    return existing;
+}
+
+function showAutocompleteHint(matches, idx) {
+    const hint = getAutocompleteHint();
+    if (matches.length === 0) {
+        hint.style.display = "none";
+        return;
+    }
+    hint.innerHTML = matches.map((m, i) =>
+        `<span class="${i === idx ? 'autocomplete-active' : ''}">${esc(m)}</span>`
+    ).join(" ");
+    hint.style.display = "block";
+}
+
+function hideAutocomplete() {
+    autocompleteMatches = [];
+    autocompleteIndex = -1;
+    autocompletePrefix = "";
+    const hint = document.getElementById("autocompleteHint");
+    if (hint) hint.style.display = "none";
+}
+
+// ── Ctrl+R Search ──
+let searchMode = false;
+let searchQuery = "";
+
+function enterSearchMode() {
+    searchMode = true;
+    searchQuery = "";
+    showSearchOverlay();
+}
+
+function exitSearchMode() {
+    searchMode = false;
+    searchQuery = "";
+    const overlay = document.getElementById("searchOverlay");
+    if (overlay) overlay.remove();
+}
+
+function showSearchOverlay() {
+    let overlay = document.getElementById("searchOverlay");
+    if (!overlay) {
+        overlay = document.createElement("div");
+        overlay.id = "searchOverlay";
+        overlay.className = "terminal-search-overlay";
+        overlay.innerHTML = `<span class="search-label">(reverse-i-search):</span> <input type="text" id="searchInput" class="search-input" placeholder="Type to search history...">
+            <span id="searchResult" class="search-result"></span>`;
+        terminalInput.parentElement.parentElement.appendChild(overlay);
+    }
+    overlay.style.display = "flex";
+    const searchInput = document.getElementById("searchInput");
+    searchInput.value = "";
+    searchInput.focus();
+    searchInput.addEventListener("input", onSearchInput);
+    searchInput.addEventListener("keydown", onSearchKeydown);
+}
+
+function onSearchInput(e) {
+    searchQuery = e.target.value;
+    const resultSpan = document.getElementById("searchResult");
+    if (!searchQuery) {
+        resultSpan.textContent = "";
+        return;
+    }
+    const match = commandHistory.find(cmd =>
+        cmd.toLowerCase().includes(searchQuery.toLowerCase())
+    );
+    resultSpan.textContent = match || "(no match)";
+    resultSpan.style.color = match ? "var(--text)" : "var(--text-dim)";
+}
+
+function onSearchKeydown(e) {
+    if (e.key === "Enter") {
+        e.preventDefault();
+        const resultSpan = document.getElementById("searchResult");
+        const match = resultSpan.textContent;
+        if (match && match !== "(no match)") {
+            terminalInput.value = match;
+        }
+        exitSearchMode();
+        terminalInput.focus();
+    } else if (e.key === "Escape") {
+        e.preventDefault();
+        exitSearchMode();
+        terminalInput.focus();
+    }
+}
+
 terminalInput.addEventListener("keydown", (e) => {
     if (e.key === "Enter") {
+        hideAutocomplete();
         runCommand(terminalInput.value);
         terminalInput.value = "";
+    } else if (e.key === "Tab") {
+        e.preventDefault();
+        const input = terminalInput.value;
+        // Only autocomplete the first word (command name)
+        const parts = input.split(/\s+/);
+        const prefix = parts[0].toLowerCase();
+        if (!prefix) return;
+
+        if (autocompletePrefix !== prefix) {
+            // New prefix — compute matches
+            autocompletePrefix = prefix;
+            autocompleteMatches = FLIPPER_COMMANDS.filter(c => c.startsWith(prefix));
+            autocompleteIndex = 0;
+        } else {
+            // Same prefix — cycle through matches
+            autocompleteIndex = (autocompleteIndex + 1) % autocompleteMatches.length;
+        }
+
+        if (autocompleteMatches.length > 0) {
+            parts[0] = autocompleteMatches[autocompleteIndex];
+            terminalInput.value = parts.join(" ");
+            showAutocompleteHint(autocompleteMatches, autocompleteIndex);
+        }
     } else if (e.key === "ArrowUp") {
         e.preventDefault();
+        hideAutocomplete();
         if (historyIndex < commandHistory.length - 1) {
             historyIndex++;
             terminalInput.value = commandHistory[historyIndex];
         }
     } else if (e.key === "ArrowDown") {
         e.preventDefault();
+        hideAutocomplete();
         if (historyIndex > 0) {
             historyIndex--;
             terminalInput.value = commandHistory[historyIndex];
@@ -325,6 +477,12 @@ terminalInput.addEventListener("keydown", (e) => {
             historyIndex = -1;
             terminalInput.value = "";
         }
+    } else if (e.key === "r" && e.ctrlKey) {
+        e.preventDefault();
+        enterSearchMode();
+    } else if (e.key !== "Tab") {
+        // Any key other than Tab resets autocomplete
+        hideAutocomplete();
     }
 });
 
@@ -359,14 +517,24 @@ async function loadDirectory(path) {
 
         data.entries.forEach((entry) => {
             const li = document.createElement("li");
+            const fullPath = `${path}/${entry.name}`.replace("//", "/");
             const icon = entry.type === "directory" ? "\u{1F4C1}" : "\u{1F4C4}";
             const size = entry.size != null ? `<span class="size">${formatSize(entry.size)}</span>` : "";
-            li.innerHTML = `<span class="icon">${icon}</span> <span>${esc(entry.name)}</span>${size}`;
+
+            let actions = '<span class="file-actions">';
+            if (entry.type === "file") {
+                actions += `<button class="file-action-btn file-action-download" onclick="event.stopPropagation();downloadFile('${esc(fullPath)}')" title="Download">&#8615;</button>`;
+            }
+            actions += `<button class="file-action-btn file-action-rename" onclick="event.stopPropagation();renameFile('${esc(fullPath)}')" title="Rename">&#9998;</button>`;
+            actions += `<button class="file-action-btn file-action-delete" onclick="event.stopPropagation();deleteFile('${esc(fullPath)}')" title="Delete">&#10005;</button>`;
+            actions += '</span>';
+
+            li.innerHTML = `<span class="icon">${icon}</span> <span>${esc(entry.name)}</span>${size}${actions}`;
 
             if (entry.type === "directory") {
-                li.onclick = () => loadDirectory(`${path}/${entry.name}`.replace("//", "/"));
+                li.onclick = () => loadDirectory(fullPath);
             } else {
-                li.onclick = () => viewFile(`${path}/${entry.name}`.replace("//", "/"));
+                li.onclick = () => viewFile(fullPath);
             }
             fileList.appendChild(li);
         });
@@ -436,6 +604,58 @@ async function uploadFiles(files) {
     }
     loadDirectory(currentPath);
 }
+
+// ── File Actions ──
+async function deleteFile(path) {
+    if (!confirm(`Delete "${path.split("/").pop()}"?\n\nPath: ${path}`)) return;
+    try {
+        await api(`/api/files/remove?path=${encodeURIComponent(path)}`, { method: "DELETE" });
+        appendTerminal("sys", `Deleted: ${path}`);
+        loadDirectory(currentPath);
+    } catch (e) {
+        appendTerminal("err", `Delete failed: ${e.message}`);
+    }
+}
+
+async function renameFile(path) {
+    const oldName = path.split("/").pop();
+    const newName = prompt("Rename to:", oldName);
+    if (!newName || newName === oldName) return;
+    const parentDir = path.substring(0, path.lastIndexOf("/")) || "/";
+    const newPath = `${parentDir}/${newName}`.replace("//", "/");
+    try {
+        await api("/api/files/rename", {
+            method: "POST",
+            body: JSON.stringify({ old_path: path, new_path: newPath }),
+        });
+        appendTerminal("sys", `Renamed: ${oldName} → ${newName}`);
+        loadDirectory(currentPath);
+    } catch (e) {
+        appendTerminal("err", `Rename failed: ${e.message}`);
+    }
+}
+
+function downloadFile(path) {
+    window.open(`/api/files/download?path=${encodeURIComponent(path)}`, "_blank");
+}
+
+async function createFolder() {
+    const name = prompt("New folder name:");
+    if (!name) return;
+    const folderPath = `${currentPath}/${name}`.replace("//", "/");
+    try {
+        await api("/api/files/mkdir", {
+            method: "POST",
+            body: JSON.stringify({ path: folderPath }),
+        });
+        appendTerminal("sys", `Created folder: ${folderPath}`);
+        loadDirectory(currentPath);
+    } catch (e) {
+        appendTerminal("err", `Create folder failed: ${e.message}`);
+    }
+}
+
+document.getElementById("mkdirBtn").addEventListener("click", createFolder);
 
 // ── WiFi Scanner (Marauder) ──
 const marauderStatusDot = document.getElementById("marauderStatusDot");
@@ -673,13 +893,25 @@ function renderSubghzSignals(data) {
         </div>`;
     } else {
         data.signals.forEach((sig, i) => {
+            const sigJson = JSON.stringify({
+                protocol: sig.protocol || "",
+                key: sig.key || "",
+                bits: sig.bits || 24,
+                frequency: data.frequency,
+                te: sig.te || null,
+            });
             html += `<div class="signal-card">
                 <div class="signal-protocol">${esc(sig.protocol)}</div>
                 <div class="signal-details">`;
             if (sig.bits) html += `<div><span class="label">Bits:</span> <span class="value">${sig.bits}</span></div>`;
             if (sig.key) html += `<div><span class="label">Key:</span> <span class="signal-key">${esc(sig.key)}</span></div>`;
             if (sig.te) html += `<div><span class="label">TE:</span> <span class="value">${sig.te} \u00b5s</span></div>`;
-            html += `</div></div>`;
+            html += `</div>
+                <div style="margin-top: 8px; display: flex; gap: 6px; align-items: center;">
+                    <input type="text" class="port-select" id="subghzSaveName${i}" placeholder="Name (e.g. Garage Door)" style="width: 180px; min-width: 100px; margin-bottom: 0; padding: 4px 8px; font-size: 12px;">
+                    <button class="btn btn-sm btn-primary" onclick="saveSubghzSignal(${i}, ${esc(sigJson)})">Save</button>
+                </div>
+            </div>`;
         });
     }
 
@@ -691,6 +923,87 @@ function renderSubghzSignals(data) {
     </details>`;
 
     subghzResults.innerHTML = html;
+}
+
+// ── Sub-GHz Signal Library ──
+async function saveSubghzSignal(index, sigData) {
+    const nameInput = document.getElementById(`subghzSaveName${index}`);
+    const name = nameInput ? nameInput.value.trim() : "";
+    if (!name) {
+        nameInput.style.borderColor = "var(--red)";
+        nameInput.focus();
+        return;
+    }
+
+    try {
+        await api("/api/subghz/signals", {
+            method: "POST",
+            body: JSON.stringify({
+                name,
+                protocol: sigData.protocol,
+                key: sigData.key,
+                bits: sigData.bits,
+                frequency: sigData.frequency,
+                te: sigData.te,
+            }),
+        });
+        nameInput.style.borderColor = "var(--green)";
+        nameInput.value = "Saved!";
+        nameInput.disabled = true;
+        loadSubghzLibrary();
+    } catch (e) {
+        nameInput.style.borderColor = "var(--red)";
+    }
+}
+
+async function loadSubghzLibrary() {
+    const container = document.getElementById("subghzSavedSignals");
+    try {
+        const data = await api("/api/subghz/signals");
+        if (data.signals.length === 0) {
+            container.innerHTML = '<div style="color: var(--text-dim); font-size: 12px; padding: 16px; text-align: center;">No saved signals yet.<br><br>Capture signals with Listen, then save them here.</div>';
+            return;
+        }
+
+        let html = "";
+        data.signals.forEach(sig => {
+            const freqMhz = (sig.frequency / 1_000_000).toFixed(2);
+            html += `<div class="saved-signal">
+                <button class="btn btn-sm btn-primary saved-signal-play" onclick="replaySubghzSignal('${sig.id}')" title="Transmit">&#9654;</button>
+                <div class="saved-signal-info">
+                    <span class="saved-signal-name">${esc(sig.name)}</span>
+                    <span class="saved-signal-detail">${esc(sig.protocol)} | ${esc(sig.key)} | ${freqMhz} MHz</span>
+                </div>
+                <button class="btn btn-sm btn-danger" onclick="deleteSubghzSignal('${sig.id}')" title="Delete">&times;</button>
+            </div>`;
+        });
+
+        container.innerHTML = html;
+    } catch (e) {
+        container.innerHTML = `<div style="color: var(--red); font-size: 12px; padding: 8px;">${esc(e.message)}</div>`;
+    }
+}
+
+async function replaySubghzSignal(id) {
+    try {
+        const data = await api(`/api/subghz/signals/${id}/transmit`, { method: "POST" });
+        const btn = document.querySelector(`[onclick="replaySubghzSignal('${id}')"]`);
+        if (btn) {
+            btn.textContent = "\u2713";
+            setTimeout(() => { btn.innerHTML = "&#9654;"; }, 600);
+        }
+    } catch (e) {
+        alert(`Transmit failed: ${e.message}`);
+    }
+}
+
+async function deleteSubghzSignal(id) {
+    try {
+        await api(`/api/subghz/signals/${id}`, { method: "DELETE" });
+        loadSubghzLibrary();
+    } catch (e) {
+        alert(`Delete failed: ${e.message}`);
+    }
 }
 
 function renderSubghzRaw(data) {
@@ -1430,6 +1743,26 @@ screenCtx.imageSmoothingEnabled = false;
 
 let screenMirroring = false;
 
+function resizeScreenCanvas() {
+    const container = document.querySelector('.screen-mirror-body');
+    if (!container) return;
+    const w = container.clientWidth - 32;  // padding
+    const h = container.clientHeight - 32;
+    // Fit 2:1 aspect ratio (128x64) into available space
+    let canvasW = Math.min(w, h * 2);
+    let canvasH = canvasW / 2;
+    if (canvasH > h) { canvasH = h; canvasW = canvasH * 2; }
+    // Snap to integer multiples of 128x64 for crisp pixels
+    const scale = Math.max(1, Math.floor(canvasW / 128));
+    screenCanvas.width = 128 * scale;
+    screenCanvas.height = 64 * scale;
+    screenCanvas.style.width = (128 * scale) + 'px';
+    screenCanvas.style.height = (64 * scale) + 'px';
+    screenCtx.imageSmoothingEnabled = false;
+}
+
+window.addEventListener('resize', () => { if (screenMirroring) resizeScreenCanvas(); });
+
 function setScreenMirrorUI(active) {
     screenMirroring = active;
     screenStartBtn.disabled = active;
@@ -1449,6 +1782,7 @@ function startScreenMirror() {
         setScreenMirrorUI(true);
         screenCanvas.style.display = "block";
         screenPlaceholder.style.display = "none";
+        resizeScreenCanvas();
     };
 
     screenWs.onmessage = (evt) => {
@@ -1458,7 +1792,7 @@ function startScreenMirror() {
             const img = new Image();
             img.onload = () => {
                 screenCtx.imageSmoothingEnabled = false;
-                screenCtx.drawImage(img, 0, 0, 512, 256);
+                screenCtx.drawImage(img, 0, 0, screenCanvas.width, screenCanvas.height);
             };
             img.src = "data:image/png;base64," + msg.data;
             if (msg.fps !== undefined) {

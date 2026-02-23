@@ -1,6 +1,7 @@
 """File management endpoints for Flipper Zero SD card."""
 
 from fastapi import APIRouter, HTTPException, UploadFile, File
+from fastapi.responses import Response
 from pydantic import BaseModel
 from app import file_manager
 
@@ -9,6 +10,11 @@ router = APIRouter(prefix="/api/files", tags=["files"])
 
 class PathRequest(BaseModel):
     path: str
+
+
+class RenameRequest(BaseModel):
+    old_path: str
+    new_path: str
 
 
 @router.get("/list")
@@ -66,6 +72,35 @@ async def make_directory(req: PathRequest):
     try:
         result = await file_manager.mkdir(req.path)
         return {"path": req.path, "result": result}
+    except ConnectionError as e:
+        raise HTTPException(status_code=503, detail=str(e))
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+
+@router.post("/rename")
+async def rename_path(req: RenameRequest):
+    """Rename or move a file/directory on the Flipper."""
+    try:
+        result = await file_manager.rename(req.old_path, req.new_path)
+        return {"old_path": req.old_path, "new_path": req.new_path, "result": result}
+    except ConnectionError as e:
+        raise HTTPException(status_code=503, detail=str(e))
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+
+@router.get("/download")
+async def download_file(path: str):
+    """Download a file from the Flipper as a binary attachment."""
+    try:
+        content = await file_manager.read_file(path)
+        filename = path.rsplit("/", 1)[-1]
+        return Response(
+            content=content.encode("utf-8", errors="surrogateescape"),
+            media_type="application/octet-stream",
+            headers={"Content-Disposition": f'attachment; filename="{filename}"'},
+        )
     except ConnectionError as e:
         raise HTTPException(status_code=503, detail=str(e))
     except Exception as e:
