@@ -1331,6 +1331,7 @@ let _irdbTree = null;
 let _irdbTreeLoading = false;
 let _irdbSearchDebounce = null;
 let _irdbLastResults = null;
+let _irdbSearchActive = false;
 
 async function irdbLoadTree() {
   if (_irdbTree) return _irdbTree;
@@ -1415,16 +1416,18 @@ irdbSearchInput.addEventListener('input', () => {
   clearTimeout(_irdbSearchDebounce);
   const query = irdbSearchInput.value.trim();
   if (!query) {
+    _irdbSearchActive = false;
     irdbSearchStatus.textContent = '';
     irdbBrowse('');
     return;
   }
+  _irdbSearchActive = true;
   _irdbSearchDebounce = setTimeout(async () => {
     const tree = await irdbLoadTree();
-    if (!tree) return;
-    const results = irdbSearch(query, tree);
+    if (!tree || !_irdbSearchActive) return;
+    const results = irdbSearch(irdbSearchInput.value.trim(), tree);
     _irdbLastResults = results;
-    irdbRenderSearchResults(results, query);
+    irdbRenderSearchResults(results, irdbSearchInput.value.trim());
     irdbBreadcrumb.innerHTML = '';
   }, 250);
 });
@@ -1434,6 +1437,7 @@ irdbSearchInput.addEventListener('keydown', (e) => {
     irdbSearchInput.value = '';
     irdbSearchStatus.textContent = '';
     _irdbLastResults = null;
+    _irdbSearchActive = false;
     irdbBrowse('');
   } else if (e.key === 'Enter') {
     e.preventDefault();
@@ -1456,7 +1460,7 @@ irdbSearchInput.addEventListener('keydown', (e) => {
   }
 });
 
-document.getElementById('irdbOpenBtn').addEventListener('click', () => { irdbOverlay.style.display = 'flex'; irdbBrowse(''); irdbSearchInput.value = ''; setTimeout(() => irdbSearchInput.focus(), 50); });
+document.getElementById('irdbOpenBtn').addEventListener('click', () => { irdbOverlay.style.display = 'flex'; _irdbSearchActive = false; irdbSearchInput.value = ''; irdbBrowse(''); setTimeout(() => irdbSearchInput.focus(), 50); });
 document.getElementById('irdbCloseBtn').addEventListener('click', () => { irdbOverlay.style.display = 'none'; });
 irdbOverlay.addEventListener('click', (e) => { if (e.target === irdbOverlay) irdbOverlay.style.display = 'none'; });
 
@@ -1475,6 +1479,7 @@ function irdbRenderBreadcrumb(path) {
 }
 
 async function irdbBrowse(path) {
+  if (_irdbSearchActive) return;
   if (!path) irdbSearchInput.value = '';
   irdbRenderBreadcrumb(path);
   irdbBody.innerHTML = '<div class="scan-status"><span class="spinner"></span> Loading...</div>';
@@ -1501,6 +1506,9 @@ async function irdbBrowse(path) {
       else if (item.type === 'file' && item.name.endsWith('.ir')) children.push({ name: item.name, type: 'file', size: item.size || 0 });
     }
     children.sort((a, b) => (a.type !== 'directory') - (b.type !== 'directory') || a.name.toLowerCase().localeCompare(b.name.toLowerCase()));
+
+    // Abort if user started searching while we were fetching
+    if (_irdbSearchActive) return;
 
     let html = '';
     children.forEach(item => {
