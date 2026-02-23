@@ -1330,6 +1330,7 @@ const irdbSearchStatus = document.getElementById('irdbSearchStatus');
 let _irdbTree = null;
 let _irdbTreeLoading = false;
 let _irdbSearchDebounce = null;
+let _irdbLastResults = null;
 
 async function irdbLoadTree() {
   if (_irdbTree) return _irdbTree;
@@ -1422,6 +1423,7 @@ irdbSearchInput.addEventListener('input', () => {
     const tree = await irdbLoadTree();
     if (!tree) return;
     const results = irdbSearch(query, tree);
+    _irdbLastResults = results;
     irdbRenderSearchResults(results, query);
     irdbBreadcrumb.innerHTML = '';
   }, 250);
@@ -1431,7 +1433,26 @@ irdbSearchInput.addEventListener('keydown', (e) => {
   if (e.key === 'Escape') {
     irdbSearchInput.value = '';
     irdbSearchStatus.textContent = '';
+    _irdbLastResults = null;
     irdbBrowse('');
+  } else if (e.key === 'Enter') {
+    e.preventDefault();
+    // If results haven't loaded yet, force an immediate search
+    const query = irdbSearchInput.value.trim();
+    if (!query) return;
+    clearTimeout(_irdbSearchDebounce);
+    (async () => {
+      const tree = await irdbLoadTree();
+      if (!tree) return;
+      const results = irdbSearch(query, tree);
+      _irdbLastResults = results;
+      if (results.length === 1) {
+        irdbOpenFile(results[0].path);
+      } else {
+        irdbRenderSearchResults(results, query);
+        irdbBreadcrumb.innerHTML = '';
+      }
+    })();
   }
 });
 
