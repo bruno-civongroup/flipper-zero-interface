@@ -6,3 +6,4 @@ __pycache__/
 dist/
 build/
 signals.json
+.wrangler/
