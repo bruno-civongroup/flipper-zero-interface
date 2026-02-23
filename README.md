@@ -1,90 +1,82 @@
 # Flipper Zero Web Interface
 
-Browser-based control panel for Flipper Zero over USB serial. Connect your Flipper, open `localhost:8000`, and access all major features without touching the device.
+Browser-based control panel for Flipper Zero over USB. Uses the [Web Serial API](https://developer.mozilla.org/en-US/docs/Web/API/Web_Serial_API) to talk directly to the Flipper — no backend, no drivers, no install. Just open the page in Chrome or Edge and connect.
+
+**Live:** [projects.brunomalnovic.com](https://projects.brunomalnovic.com)
 
 ## Features
 
-- **Terminal** — send CLI commands directly, with history (up/down arrows)
-- **File Browser** — navigate the SD card, view files, drag-and-drop upload
-- **WiFi Scanner** — scan APs and stations via Marauder (ESP32 UART bridge)
-- **Sub-GHz** — listen for decoded/raw signals on 315/433/868/915 MHz
-- **NFC / RFID** — read NFC tags (13.56 MHz) and RFID cards (125 kHz)
-- **Infrared** — learn decoded/raw IR signals, transmit, universal remote (TV/AC/Audio)
-- **Remote Control** — virtual D-pad to navigate the Flipper's UI (click = short, hold = long press)
-- **Screen Mirror** — live stream of the Flipper's 128x64 LCD at ~3-5 FPS via WebSocket
+- **Terminal** — send CLI commands with history, tab-autocomplete, and Ctrl+R reverse search
+- **File Browser** — navigate the SD card, view files, rename, delete, drag-and-drop upload (binary-safe)
+- **WiFi Scanner** — scan APs and stations via Marauder (ESP32 over Flipper UART bridge)
+- **Sub-GHz** — listen for decoded/raw signals on 315/433/868/915 MHz, save and replay signals
+- **NFC / RFID** — read NFC tags (13.56 MHz) and RFID cards (125 kHz), save to persistent library
+- **Infrared** — learn decoded/raw IR signals, transmit, universal remote (TV/AC/Audio), import from [Flipper-IRDB](https://github.com/Lucaslhm/Flipper-IRDB)
+- **Remote Control** — virtual D-pad (click = short press, hold 500ms+ = long press)
+- **Screen Mirror** — live stream of the Flipper's 128x64 LCD at ~3-5 FPS with screenshot capture
+- **Signal Libraries** — save, export, and import signal collections (IR, Sub-GHz, NFC, RFID) as JSON, persisted in localStorage
 
-## Setup
+## Requirements
 
-Requires Python 3.10+ and a Flipper Zero connected via USB.
-
-```bash
-# Clone
-git clone https://github.com/bruno-civongroup/flipper-zero-interface.git
-cd flipper-zero-interface
-
-# Create venv and install dependencies
-python -m venv venv
-venv\Scripts\activate   # Windows
-# source venv/bin/activate  # Linux/Mac
-pip install -r requirements.txt
-
-# Run
-python run.py
-```
-
-Open **http://localhost:8000** in your browser.
+- **Browser:** Chrome or Edge (desktop) — Firefox and Safari do not support Web Serial
+- **Hardware:** Flipper Zero connected via USB
+- **WiFi scanning** additionally requires an ESP32 with Marauder firmware connected to the Flipper's GPIO UART
 
 ## Usage
 
-1. Plug in your Flipper Zero via USB
-2. Click **Refresh Ports** — the Flipper auto-detects as `COMx` (VID `0483`, PID `5740`)
-3. Click **Connect**
+1. Open the app in Chrome/Edge
+2. Click **Connect Flipper** (or press `Ctrl+K`)
+3. Select your Flipper's serial port in the browser picker
 4. Use the tabs to access each feature
 
-### Remote Control
+### Keyboard Shortcuts
 
-The D-pad mirrors the Flipper's physical buttons. Click for a short press, hold 500ms+ for a long press. Works with touch on mobile.
-
-### Screen Mirror
-
-Click **Start Mirror** to stream the Flipper's display in real time. The 128x64 screen is scaled 4x with crisp pixel rendering. Use alongside the Remote tab to fully control the Flipper from your browser.
-
-### Infrared
-
-- **Learn** — point a remote at the Flipper's IR receiver, click Learn to capture the signal
-- **Transmit** — replay a captured signal by protocol, address, and command
-- **Universal Remote** — built-in TV, AC, and Audio button presets
-
-## Tech Stack
-
-- **Backend:** FastAPI, pyserial, Pillow, uvicorn
-- **Frontend:** Vanilla HTML/CSS/JS (no build step)
-- **Protocol:** REST API + WebSocket for live features (monitor, screen mirror)
+| Shortcut | Action |
+|----------|--------|
+| `Ctrl+1` through `Ctrl+8` | Switch tabs |
+| `Ctrl+/` | Focus terminal |
+| `Ctrl+K` | Connect/disconnect |
+| `Ctrl+R` (in terminal) | Reverse search history |
+| `Tab` (in terminal) | Autocomplete commands |
 
 ## Project Structure
 
 ```
-app/
-  main.py              # FastAPI app, router registration
-  serial_manager.py    # Flipper serial communication (230400 baud)
-  file_manager.py      # SD card file operations
-  marauder.py          # ESP32 Marauder WiFi interface
-  routes/
-    serial.py          # /api/serial/* — connect, disconnect, commands
-    files.py           # /api/files/* — browse, read, upload
-    monitor.py         # /ws/monitor — live status WebSocket
-    wifi.py            # /api/wifi/* — Marauder AP/station scanning
-    subghz.py          # /api/subghz/* — CC1101 radio
-    nfcrfid.py         # /api/nfc/*, /api/rfid/* — tag/card reading
-    ir.py              # /api/ir/* — infrared learn/transmit/universal
-    input.py           # /api/input/* — button press simulation
-    screen.py          # /ws/screen — screen mirror WebSocket
-    export.py          # /api/export/* — JSON/CSV download
-  static/
-    index.html         # Single-page app
-    app.js             # Frontend logic
-    style.css          # Dark theme UI
-run.py                 # Entry point (uvicorn)
+index.html                 # Single-page app
+style.css                  # Dark theme UI
+_headers                   # Cloudflare Pages HTTP headers
+js/
+  app.js                   # Main application logic (~1500 lines)
+  ExportHelper.js          # JSON/CSV download helpers
+  serial/
+    FlipperSerial.js       # Web Serial driver (230400 baud, CLI protocol)
+    MarauderSerial.js      # ESP32 Marauder UART bridge
+    ScreenMirror.js        # Protobuf RPC screen streaming
+    Mutex.js               # Serial port lock
+  parsers/
+    FileParser.js          # SD card file listing parser
+    IrParser.js            # IR signal and .ir file parser
+    SubghzParser.js        # Sub-GHz signal parser
+    NfcRfidParser.js       # NFC/RFID scan output parser
+    WifiParser.js          # Marauder AP/station list parser
+  storage/
+    SignalStore.js          # localStorage-backed signal library
+```
+
+## Development
+
+No build step. Open `index.html` directly or serve with any static server:
+
+```bash
+npx serve .
+```
+
+## Deployment
+
+Hosted on Cloudflare Pages:
+
+```bash
+npx wrangler pages deploy .
 ```
 
 ## License
