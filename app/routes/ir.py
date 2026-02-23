@@ -103,6 +103,8 @@ async def learn(req: LearnRequest):
         }
     except ConnectionError as e:
         raise HTTPException(status_code=503, detail=str(e))
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
 
 
 @router.post("/learn/raw")
@@ -121,6 +123,8 @@ async def learn_raw(req: LearnRequest):
         }
     except ConnectionError as e:
         raise HTTPException(status_code=503, detail=str(e))
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
 
 
 @router.post("/transmit")
@@ -142,6 +146,8 @@ async def transmit(req: TransmitRequest):
         }
     except ConnectionError as e:
         raise HTTPException(status_code=503, detail=str(e))
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
 
 
 @router.post("/universal")
@@ -193,6 +199,8 @@ async def list_saved():
         return {"files": files, "count": len(files)}
     except ConnectionError as e:
         raise HTTPException(status_code=503, detail=str(e))
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
 
 
 # ── Signal Library (persistent local storage) ──
@@ -264,6 +272,8 @@ async def transmit_saved(signal_id: str):
         }
     except ConnectionError as e:
         raise HTTPException(status_code=503, detail=str(e))
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
 
 
 # ── IRDB (Flipper-IRDB from GitHub) ──
@@ -286,6 +296,15 @@ async def _get_irdb_contents(path: str = "") -> list[dict]:
     url = f"https://api.github.com/repos/{IRDB_REPO}/contents/{path}?ref={IRDB_BRANCH}"
     async with httpx.AsyncClient() as client:
         resp = await client.get(url, headers={"Accept": "application/vnd.github+json"})
+        if resp.status_code == 403:
+            reset = resp.headers.get("x-ratelimit-reset")
+            if reset:
+                wait_min = max(1, int((int(reset) - now) / 60))
+                raise HTTPException(
+                    status_code=429,
+                    detail=f"GitHub API rate limited. Try again in ~{wait_min} minute(s).",
+                )
+            raise HTTPException(status_code=429, detail="GitHub API rate limited. Try again later.")
         if resp.status_code != 200:
             raise HTTPException(status_code=502, detail=f"GitHub API error: {resp.status_code}")
         data = resp.json()
@@ -328,6 +347,8 @@ async def irdb_file(path: str):
     url = f"https://raw.githubusercontent.com/{IRDB_REPO}/{IRDB_BRANCH}/{path}"
     async with httpx.AsyncClient() as client:
         resp = await client.get(url)
+        if resp.status_code == 403:
+            raise HTTPException(status_code=429, detail="GitHub rate limited. Try again later.")
         if resp.status_code != 200:
             raise HTTPException(status_code=404, detail="File not found in IRDB")
         content = resp.text

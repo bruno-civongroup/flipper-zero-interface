@@ -36,6 +36,8 @@ async def connect(req: ConnectRequest = ConnectRequest()):
         return {"connected": True, "port": device}
     except ConnectionError as e:
         raise HTTPException(status_code=404, detail=str(e))
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
 
 
 @router.post("/disconnect")
@@ -53,3 +55,5 @@ async def send_command(req: CommandRequest):
         return {"command": req.command, "response": response}
     except ConnectionError as e:
         raise HTTPException(status_code=503, detail=str(e))
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))

@@ -195,6 +195,8 @@ async def connect(req: ConnectRequest = ConnectRequest()):
         return {"connected": True, "port": device, "mode": "direct"}
     except ConnectionError as e:
         raise HTTPException(status_code=404, detail=str(e))
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
 
 
 @router.post("/disconnect")
@@ -210,6 +212,8 @@ async def send_command(req: CommandRequest):
         return {"command": req.command, "response": response}
     except ConnectionError as e:
         raise HTTPException(status_code=503, detail=str(e))
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
 
 
 # ── Unified scan endpoints (auto-select direct vs bridge) ──
@@ -233,6 +237,8 @@ async def scan_access_points():
         return {"raw": raw, "access_points": aps, "count": len(aps)}
     except ConnectionError as e:
         raise HTTPException(status_code=503, detail=str(e))
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
 
 
 @router.post("/scan/station")
@@ -253,6 +259,8 @@ async def scan_stations():
         return {"raw": raw, "stations": stations, "count": len(stations)}
     except ConnectionError as e:
         raise HTTPException(status_code=503, detail=str(e))
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
 
 
 @router.post("/scan/stop")
@@ -271,6 +279,8 @@ async def stop_scan():
         return {"result": result}
     except ConnectionError as e:
         raise HTTPException(status_code=503, detail=str(e))
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
 
 
 @router.post("/scan/raw")
@@ -290,6 +300,8 @@ async def raw_marauder_command(req: RawMarauderCmd):
         return {"command": req.command, "response": result}
     except ConnectionError as e:
         raise HTTPException(status_code=503, detail=str(e))
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
 
 
 # ── Parsers ──

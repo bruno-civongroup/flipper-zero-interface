@@ -40,3 +40,5 @@ async def send_input(req: InputRequest):
         return {"key": key, "type": press_type, "result": result}
     except ConnectionError as e:
         raise HTTPException(status_code=503, detail=str(e))
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))

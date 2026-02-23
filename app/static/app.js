@@ -1496,6 +1496,37 @@ function stopScreenMirror() {
 screenStartBtn.addEventListener("click", startScreenMirror);
 screenStopBtn.addEventListener("click", stopScreenMirror);
 
+// ── Keyboard Shortcuts ──
+const TAB_ORDER = ["terminal", "files", "wifi", "subghz", "nfcrfid", "ir", "remote", "screen"];
+
+document.addEventListener("keydown", (e) => {
+    // Ctrl+1-8: switch tabs
+    if (e.ctrlKey && !e.shiftKey && !e.altKey && e.key >= "1" && e.key <= "8") {
+        e.preventDefault();
+        const idx = parseInt(e.key) - 1;
+        if (idx < TAB_ORDER.length) {
+            const tab = document.querySelector(`.tab[data-tab="${TAB_ORDER[idx]}"]`);
+            if (tab) tab.click();
+        }
+        return;
+    }
+
+    // Ctrl+/ : focus terminal input
+    if (e.ctrlKey && e.key === "/") {
+        e.preventDefault();
+        document.querySelector('.tab[data-tab="terminal"]').click();
+        terminalInput.focus();
+        return;
+    }
+
+    // Ctrl+K : connect / disconnect
+    if (e.ctrlKey && e.key === "k") {
+        e.preventDefault();
+        toggleConnect();
+        return;
+    }
+});
+
 // ── Init ──
 document.getElementById("refreshPortsBtn").addEventListener("click", refreshPorts);
 document.getElementById("connectBtn").addEventListener("click", toggleConnect);

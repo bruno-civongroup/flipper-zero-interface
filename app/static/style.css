@@ -54,6 +54,12 @@ header h1 {
 
 .status-dot.connected { background: var(--green); }
 
+.shortcut-hint {
+    font-size: 11px;
+    color: var(--text-dim);
+    letter-spacing: 0.3px;
+}
+
 /* ── Grid layout ── */
 .main-layout {
     display: grid;

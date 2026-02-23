@@ -43,6 +43,8 @@ async def nfc_scan(req: ScanRequest):
         }
     except ConnectionError as e:
         raise HTTPException(status_code=503, detail=str(e))
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
 
 
 @router.post("/nfc/field")
@@ -56,6 +58,8 @@ async def nfc_field():
         return {"raw": raw}
     except ConnectionError as e:
         raise HTTPException(status_code=503, detail=str(e))
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
 
 
 @router.get("/nfc/saved")
@@ -71,6 +75,8 @@ async def nfc_saved():
         return {"files": files, "count": len(files)}
     except ConnectionError as e:
         raise HTTPException(status_code=503, detail=str(e))
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
 
 
 # ── RFID (125 kHz) ──
@@ -104,6 +110,8 @@ async def rfid_read(req: RfidReadRequest):
         }
     except ConnectionError as e:
         raise HTTPException(status_code=503, detail=str(e))
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
 
 
 @router.get("/rfid/saved")
@@ -119,6 +127,8 @@ async def rfid_saved():
         return {"files": files, "count": len(files)}
     except ConnectionError as e:
         raise HTTPException(status_code=503, detail=str(e))
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
 
 
 # ── Parsers ──

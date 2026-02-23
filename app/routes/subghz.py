@@ -64,6 +64,8 @@ async def listen(req: ListenRequest):
         }
     except ConnectionError as e:
         raise HTTPException(status_code=503, detail=str(e))
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
 
 
 @router.post("/listen/raw")
@@ -87,6 +89,8 @@ async def listen_raw(req: ListenRequest):
         }
     except ConnectionError as e:
         raise HTTPException(status_code=503, detail=str(e))
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
 
 
 @router.get("/saved")
@@ -102,6 +106,8 @@ async def list_saved():
         return {"files": files, "count": len(files)}
     except ConnectionError as e:
         raise HTTPException(status_code=503, detail=str(e))
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
 
 
 @router.post("/transmit")
@@ -118,6 +124,8 @@ async def transmit_from_file(req: TxFileRequest):
         return {"file": req.file_path, "repeat": req.repeat, "result": result}
     except ConnectionError as e:
         raise HTTPException(status_code=503, detail=str(e))
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
 
 
 def parse_subghz_output(raw: str) -> list[dict]:

@@ -19,6 +19,8 @@ async def list_dir(path: str = "/ext"):
         return {"path": path, "entries": entries}
     except ConnectionError as e:
         raise HTTPException(status_code=503, detail=str(e))
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
 
 
 @router.get("/read")
@@ -29,6 +31,8 @@ async def read_file(path: str):
         return {"path": path, "content": content}
     except ConnectionError as e:
         raise HTTPException(status_code=503, detail=str(e))
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
 
 
 @router.get("/stat")
@@ -39,6 +43,8 @@ async def stat_file(path: str):
         return {"path": path, "info": info}
     except ConnectionError as e:
         raise HTTPException(status_code=503, detail=str(e))
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
 
 
 @router.post("/upload")
@@ -50,6 +56,8 @@ async def upload_file(path: str, file: UploadFile = File(...)):
         return {"path": path, "size": len(content), "status": "uploaded"}
     except ConnectionError as e:
         raise HTTPException(status_code=503, detail=str(e))
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
 
 
 @router.post("/mkdir")
@@ -60,6 +68,8 @@ async def make_directory(req: PathRequest):
         return {"path": req.path, "result": result}
     except ConnectionError as e:
         raise HTTPException(status_code=503, detail=str(e))
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
 
 
 @router.delete("/remove")
@@ -70,3 +80,5 @@ async def remove_path(path: str):
         return {"path": path, "result": result}
     except ConnectionError as e:
         raise HTTPException(status_code=503, detail=str(e))
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
