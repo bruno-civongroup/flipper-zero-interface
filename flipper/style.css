@@ -1133,6 +1133,47 @@ header h1 {
     flex-shrink: 0;
 }
 
+/* ── IRDB Search ── */
+.irdb-search {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 8px 16px;
+    border-bottom: 1px solid var(--border);
+    flex-shrink: 0;
+}
+
+.irdb-search input {
+    flex: 1;
+    padding: 8px 10px;
+    background: var(--surface-2);
+    color: var(--text);
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    font-family: inherit;
+    font-size: 13px;
+    outline: none;
+}
+
+.irdb-search input:focus {
+    border-color: var(--orange);
+}
+
+.irdb-search-status {
+    font-size: 11px;
+    color: var(--text-dim);
+    white-space: nowrap;
+}
+
+.irdb-search-path {
+    font-size: 11px;
+    color: var(--text-dim);
+    margin-left: auto;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
 /* ── IR Remote Visual Layout ── */
 .ir-remote {
     background: linear-gradient(180deg, #161616 0%, #0e0e0e 100%);

@@ -1324,7 +1324,118 @@ const IRDB_BRANCH = 'main';
 const IRDB_HIDDEN = new Set(['.github', '_Converted_']);
 const _irdbCache = new Map();
 
-document.getElementById('irdbOpenBtn').addEventListener('click', () => { irdbOverlay.style.display = 'flex'; irdbBrowse(''); });
+// ── IRDB Search (GitHub Trees API + client-side filter) ──
+const irdbSearchInput = document.getElementById('irdbSearchInput');
+const irdbSearchStatus = document.getElementById('irdbSearchStatus');
+let _irdbTree = null;
+let _irdbTreeLoading = false;
+let _irdbSearchDebounce = null;
+
+async function irdbLoadTree() {
+  if (_irdbTree) return _irdbTree;
+  if (_irdbTreeLoading) {
+    // Wait for in-flight load
+    return new Promise(resolve => {
+      const check = setInterval(() => { if (_irdbTree || !_irdbTreeLoading) { clearInterval(check); resolve(_irdbTree); } }, 100);
+    });
+  }
+  _irdbTreeLoading = true;
+  irdbSearchStatus.textContent = 'Loading index...';
+  try {
+    const url = `https://api.github.com/repos/${IRDB_REPO}/git/trees/${IRDB_BRANCH}?recursive=1`;
+    const resp = await fetch(url, { headers: { 'Accept': 'application/vnd.github+json' } });
+    if (resp.status === 403) throw new Error('Rate limited');
+    if (!resp.ok) throw new Error(`API error ${resp.status}`);
+    const json = await resp.json();
+    _irdbTree = json.tree.filter(entry => {
+      if (entry.type !== 'blob' || !entry.path.endsWith('.ir')) return false;
+      const first = entry.path.split('/')[0];
+      return !IRDB_HIDDEN.has(first);
+    }).map(entry => ({ path: entry.path, size: entry.size || 0 }));
+    irdbSearchStatus.textContent = '';
+    return _irdbTree;
+  } catch (e) {
+    irdbSearchStatus.textContent = 'Index unavailable';
+    _irdbTreeLoading = false;
+    return null;
+  }
+}
+
+function irdbSearch(query, tree) {
+  const terms = query.toLowerCase().split(/\s+/).filter(Boolean);
+  if (!terms.length || !tree) return [];
+
+  const scored = [];
+  for (const entry of tree) {
+    const pathLower = entry.path.toLowerCase();
+    const parts = pathLower.split('/');
+    const filename = parts[parts.length - 1];
+
+    let match = true;
+    let score = 0;
+    for (const term of terms) {
+      if (pathLower.indexOf(term) === -1) { match = false; break; }
+      // Filename match is worth more
+      if (filename.indexOf(term) !== -1) score += 10;
+      else score += 3;
+      // Word-boundary bonus (after _ / or start)
+      const re = new RegExp('(?:^|[/_])' + term.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'));
+      if (re.test(pathLower)) score += 5;
+    }
+    if (match) scored.push({ entry, score });
+  }
+
+  scored.sort((a, b) => b.score - a.score);
+  return scored.slice(0, 100).map(s => s.entry);
+}
+
+function irdbRenderSearchResults(results, query) {
+  if (!results || results.length === 0) {
+    irdbBody.innerHTML = '<div class="info-placeholder">No matching files found</div>';
+    return;
+  }
+  let html = `<div style="font-size: 11px; color: var(--text-dim); padding: 4px 12px; margin-bottom: 4px;">${results.length}${results.length >= 100 ? '+' : ''} result(s)</div>`;
+  for (const entry of results) {
+    const parts = entry.path.split('/');
+    const filename = parts.pop().replace('.ir', '').replace(/_/g, ' ');
+    const context = parts.join(' / ').replace(/_/g, ' ');
+    const sizeStr = entry.size ? `${(entry.size / 1024).toFixed(1)} KB` : '';
+    html += `<div class="irdb-item" onclick="window._irdbOpenFile('${entry.path}')">` +
+      `<span class="icon">\u{1F4E1}</span>` +
+      `<span>${esc(filename)}</span>` +
+      `<span class="irdb-search-path">${esc(context)}</span>` +
+      `<span class="size">${sizeStr}</span>` +
+      `</div>`;
+  }
+  irdbBody.innerHTML = html;
+}
+
+irdbSearchInput.addEventListener('input', () => {
+  clearTimeout(_irdbSearchDebounce);
+  const query = irdbSearchInput.value.trim();
+  if (!query) {
+    irdbSearchStatus.textContent = '';
+    irdbBrowse('');
+    return;
+  }
+  _irdbSearchDebounce = setTimeout(async () => {
+    const tree = await irdbLoadTree();
+    if (!tree) return;
+    const results = irdbSearch(query, tree);
+    irdbRenderSearchResults(results, query);
+    irdbBreadcrumb.innerHTML = '';
+  }, 250);
+});
+
+irdbSearchInput.addEventListener('keydown', (e) => {
+  if (e.key === 'Escape') {
+    irdbSearchInput.value = '';
+    irdbSearchStatus.textContent = '';
+    irdbBrowse('');
+  }
+});
+
+document.getElementById('irdbOpenBtn').addEventListener('click', () => { irdbOverlay.style.display = 'flex'; irdbBrowse(''); irdbSearchInput.value = ''; setTimeout(() => irdbSearchInput.focus(), 50); });
 document.getElementById('irdbCloseBtn').addEventListener('click', () => { irdbOverlay.style.display = 'none'; });
 irdbOverlay.addEventListener('click', (e) => { if (e.target === irdbOverlay) irdbOverlay.style.display = 'none'; });
 
@@ -1343,6 +1454,7 @@ function irdbRenderBreadcrumb(path) {
 }
 
 async function irdbBrowse(path) {
+  if (!path) irdbSearchInput.value = '';
   irdbRenderBreadcrumb(path);
   irdbBody.innerHTML = '<div class="scan-status"><span class="spinner"></span> Loading...</div>';
 
