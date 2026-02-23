@@ -176,6 +176,8 @@ async def universal_remote(req: UniversalRequest):
         }
     except ConnectionError as e:
         raise HTTPException(status_code=503, detail=str(e))
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
 
 
 @router.get("/saved")
@@ -268,39 +270,28 @@ async def transmit_saved(signal_id: str):
 
 IRDB_REPO = "Lucaslhm/Flipper-IRDB"
 IRDB_BRANCH = "main"
-_irdb_tree_cache: dict = {"data": None, "time": 0}
 IRDB_CACHE_TTL = 600  # 10 minutes
+_irdb_dir_cache: dict = {}  # path -> {"data": [...], "time": float}
+
+# Directories to hide from browsing
+_IRDB_HIDDEN = {".github", "_Converted_"}
 
 
-async def _get_irdb_tree() -> list[dict]:
-    """Fetch the full repo tree from GitHub (cached). Returns list of {path, type, size}."""
+async def _get_irdb_contents(path: str = "") -> list[dict]:
+    """Fetch directory contents from GitHub Contents API (cached per path)."""
     now = time.time()
-    if _irdb_tree_cache["data"] and now - _irdb_tree_cache["time"] < IRDB_CACHE_TTL:
-        return _irdb_tree_cache["data"]
+    if path in _irdb_dir_cache and now - _irdb_dir_cache[path]["time"] < IRDB_CACHE_TTL:
+        return _irdb_dir_cache[path]["data"]
 
-    url = f"https://api.github.com/repos/{IRDB_REPO}/git/trees/{IRDB_BRANCH}?recursive=1"
+    url = f"https://api.github.com/repos/{IRDB_REPO}/contents/{path}?ref={IRDB_BRANCH}"
     async with httpx.AsyncClient() as client:
         resp = await client.get(url, headers={"Accept": "application/vnd.github+json"})
         if resp.status_code != 200:
             raise HTTPException(status_code=502, detail=f"GitHub API error: {resp.status_code}")
         data = resp.json()
 
-    tree = [
-        {"path": item["path"], "type": item["type"], "size": item.get("size", 0)}
-        for item in data.get("tree", [])
-        if not item["path"].startswith((".github", "_Converted_"))
-    ]
-    _irdb_tree_cache["data"] = tree
-    _irdb_tree_cache["time"] = now
-    return tree
-
-
-@router.get("/irdb/categories")
-async def irdb_categories():
-    """List top-level IRDB categories (TVs, ACs, Speakers, etc.)."""
-    tree = await _get_irdb_tree()
-    cats = sorted({p["path"].split("/")[0] for p in tree if "/" in p["path"]})
-    return {"categories": cats}
+    _irdb_dir_cache[path] = {"data": data, "time": now}
+    return data
 
 
 @router.get("/irdb/browse")
@@ -308,29 +299,21 @@ async def irdb_browse(path: str = ""):
     """
     Browse the IRDB at any level.
 
+    Fetches directory contents on demand via the GitHub Contents API,
+    which avoids the truncation issue with recursive tree fetches.
     Returns immediate children (directories and .ir files) at the given path.
     """
-    tree = await _get_irdb_tree()
-    prefix = path.rstrip("/") + "/" if path else ""
-    depth = prefix.count("/") if prefix else 0
+    contents = await _get_irdb_contents(path)
 
     children = []
-    seen = set()
-    for item in tree:
-        if not item["path"].startswith(prefix):
+    for item in contents:
+        name = item["name"]
+        if name in _IRDB_HIDDEN:
             continue
-        rest = item["path"][len(prefix):]
-        if not rest:
-            continue
-        # Immediate children only
-        parts = rest.split("/")
-        if item["type"] == "tree" and len(parts) == 1:
-            name = parts[0]
-            if name not in seen:
-                children.append({"name": name, "type": "directory"})
-                seen.add(name)
-        elif item["type"] == "blob" and len(parts) == 1 and rest.endswith(".ir"):
-            children.append({"name": rest, "type": "file", "size": item.get("size", 0)})
+        if item["type"] == "dir":
+            children.append({"name": name, "type": "directory"})
+        elif item["type"] == "file" and name.endswith(".ir"):
+            children.append({"name": name, "type": "file", "size": item.get("size", 0)})
 
     children.sort(key=lambda x: (x["type"] != "directory", x["name"].lower()))
     return {"path": path, "children": children}

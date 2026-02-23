@@ -58,7 +58,7 @@ header h1 {
 .main-layout {
     display: grid;
     grid-template-columns: 240px 1fr;
-    grid-template-rows: 1fr 1fr;
+    grid-template-rows: 1fr;
     gap: 1px;
     height: calc(100vh - 50px);
     background: var(--border);
@@ -86,7 +86,6 @@ header h1 {
 }
 
 .panel-body {
-    flex: 1;
     overflow-y: auto;
     padding: 12px;
 }
@@ -117,6 +116,7 @@ header h1 {
     display: flex;
     flex-direction: column;
     gap: 4px;
+    flex-shrink: 0;
 }
 
 .btn {
@@ -174,18 +174,35 @@ header h1 {
     pointer-events: none;
 }
 
-/* ── Info Panel (top right) ── */
-.info-panel {
-    grid-column: 2;
-    grid-row: 1;
+/* ── Sidebar Info Output ── */
+.sidebar-info {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    border-top: 1px solid var(--border);
+    overflow: hidden;
+    min-height: 0;
 }
 
-.info-output {
+.sidebar-info-header {
+    padding: 8px 12px;
+    font-size: 11px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    color: var(--orange);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-shrink: 0;
+}
+
+.sidebar-info-output {
     flex: 1;
     overflow-y: auto;
-    padding: 16px;
-    font-size: 13px;
-    line-height: 1.7;
+    padding: 8px 12px;
+    font-size: 12px;
+    line-height: 1.6;
 }
 
 .info-placeholder {
@@ -203,21 +220,23 @@ header h1 {
 }
 
 .info-table td {
-    padding: 6px 8px;
+    padding: 3px 4px;
     vertical-align: top;
+    display: block;
+    font-size: 11px;
 }
 
 .info-table td:first-child {
     color: var(--text);
     font-weight: 600;
-    white-space: nowrap;
-    width: 1%;
-    padding-right: 16px;
+    padding-bottom: 0;
 }
 
 .info-table td:last-child {
     color: var(--text-dim);
     word-break: break-all;
+    padding-top: 0;
+    padding-bottom: 6px;
 }
 
 .info-raw {
@@ -226,10 +245,10 @@ header h1 {
     color: var(--text-dim);
 }
 
-/* ── Bottom Panel (tabbed) ── */
+/* ── Tabbed Panel (right side, full height) ── */
 .bottom-panel {
     grid-column: 2;
-    grid-row: 2;
+    grid-row: 1;
 }
 
 .tab-bar {

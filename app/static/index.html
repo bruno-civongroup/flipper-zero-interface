@@ -37,20 +37,20 @@
                 <button class="btn btn-sm btn-quick" data-cmd="free" data-label="Memory">Memory</button>
                 <button class="btn btn-sm btn-quick" data-cmd="uptime" data-label="Uptime">Uptime</button>
             </div>
+
+            <!-- Info output in sidebar -->
+            <div class="sidebar-info">
+                <div class="sidebar-info-header">
+                    <span id="infoPanelTitle">Device Info</span>
+                    <button class="btn btn-sm btn-primary" id="refreshInfoBtn">Refresh</button>
+                </div>
+                <div class="sidebar-info-output" id="infoOutput">
+                    <div class="info-placeholder">Connect to Flipper to view device info</div>
+                </div>
+            </div>
         </div>
 
-        <!-- Info Panel (top right) — swaps content -->
-        <div class="panel info-panel">
-            <div class="panel-header">
-                <span id="infoPanelTitle">Device Info</span>
-                <button class="btn btn-sm btn-primary" id="refreshInfoBtn">Refresh</button>
-            </div>
-            <div class="info-output" id="infoOutput">
-                <div class="info-placeholder">Connect to Flipper to view device info</div>
-            </div>
-        </div>
-
-        <!-- Bottom right — tabbed: Terminal / File Browser / WiFi -->
+        <!-- Right panel — tabbed: Terminal / File Browser / WiFi -->
         <div class="panel bottom-panel">
             <div class="tab-bar">
                 <button class="tab active" data-tab="terminal">Terminal</button>
