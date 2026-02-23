@@ -148,10 +148,10 @@ function connectWs() {
     ws = new WebSocket(`${proto}://${location.host}/ws/monitor`);
     ws.onmessage = (evt) => {
         const msg = JSON.parse(evt.data);
-        if (msg.type === "status" && msg.connected && msg.info) {
-            // Only auto-update if viewing device_info
-            if (activeQuickCmd === "device_info") {
-                renderInfoPanel("Device Info", msg.info);
+        if (msg.type === "status") {
+            // Update connection indicator if Flipper disconnects unexpectedly
+            if (!msg.connected && connected) {
+                setConnected(false);
             }
         }
     };
@@ -947,25 +947,154 @@ async function saveIrSignal(index, sigData) {
     }
 }
 
+// ── Signal-to-Remote-Slot Mapper ──
+function mapSignalToSlot(name) {
+    const n = name.toLowerCase().replace(/[\s\-\.]+/g, '_').replace(/[^a-z0-9_]/g, '');
+
+    const exact = {
+        'power': 'power', 'pwr': 'power', 'on_off': 'power', 'standby': 'power', 'power_toggle': 'power',
+        'mute': 'mute',
+        'source': 'source', 'input': 'source', 'tv_av': 'source', 'hdmi': 'source', 'src': 'source',
+        'vol_up': 'vol_up', 'volume_up': 'vol_up',
+        'vol_dn': 'vol_down', 'vol_down': 'vol_down', 'volume_down': 'vol_down',
+        'ch_next': 'ch_up', 'ch_up': 'ch_up', 'channel_up': 'ch_up',
+        'ch_prev': 'ch_down', 'ch_down': 'ch_down', 'channel_down': 'ch_down', 'ch_dn': 'ch_down',
+        'up': 'up', 'down': 'down', 'left': 'left', 'right': 'right',
+        'ok': 'ok', 'select': 'ok', 'enter': 'ok',
+        'menu': 'menu', 'tools': 'tools',
+        'home': 'home', 'smarthub': 'home', 'smart_hub': 'home',
+        'info': 'info', 'guide': 'guide',
+        'back': 'back', 'return': 'back', 'ret': 'back', 'previous': 'back',
+        'exit': 'exit',
+        '0': 'num0', '1': 'num1', '2': 'num2', '3': 'num3', '4': 'num4',
+        '5': 'num5', '6': 'num6', '7': 'num7', '8': 'num8', '9': 'num9',
+    };
+
+    if (exact[n]) return exact[n];
+
+    // Keyword fallbacks
+    if (n.includes('power') || n.includes('pwr') || n.includes('on_off')) return 'power';
+    if (n.includes('mute')) return 'mute';
+    if (n.includes('source') || n.includes('input') || n.includes('hdmi')) return 'source';
+    if ((n.includes('vol') || n.includes('volume')) && (n.includes('up') || n.includes('+'))) return 'vol_up';
+    if ((n.includes('vol') || n.includes('volume')) && (n.includes('dn') || n.includes('down') || n.includes('-'))) return 'vol_down';
+    if ((n.includes('ch') || n.includes('channel')) && (n.includes('up') || n.includes('next') || n.includes('+'))) return 'ch_up';
+    if ((n.includes('ch') || n.includes('channel')) && (n.includes('dn') || n.includes('down') || n.includes('prev') || n.includes('-'))) return 'ch_down';
+    if (n.includes('menu')) return 'menu';
+    if (n.includes('home') || n.includes('smart')) return 'home';
+    if (n.includes('info')) return 'info';
+    if (n.includes('guide')) return 'guide';
+    if (n.includes('back') || n.includes('return')) return 'back';
+    if (n.includes('exit')) return 'exit';
+
+    return null;
+}
+
 async function loadSavedSignals() {
     const container = document.getElementById("irSavedSignals");
     try {
         const data = await api("/api/ir/signals");
         if (data.signals.length === 0) {
-            container.innerHTML = '<div style="color: var(--text-dim); font-size: 12px; padding: 8px;">No saved signals yet. Capture a signal and click Save.</div>';
+            container.innerHTML = '<div style="color: var(--text-dim); font-size: 12px; padding: 16px; text-align: center;">No signals yet.<br><br>Capture signals with Learn or import from IRDB.</div>';
             return;
         }
-        let html = "";
-        data.signals.forEach((sig) => {
-            html += `<div class="saved-signal">
-                <button class="btn btn-sm btn-primary saved-signal-play" onclick="replaySignal('${sig.id}')" title="Transmit">&#9654;</button>
-                <div class="saved-signal-info">
-                    <span class="saved-signal-name">${esc(sig.name)}</span>
-                    <span class="saved-signal-detail">${esc(sig.protocol)} ${esc(sig.address)} ${esc(sig.command)}</span>
-                </div>
-                <button class="btn btn-sm btn-danger" onclick="deleteSignal('${sig.id}')" title="Delete">&times;</button>
-            </div>`;
-        });
+
+        // Map signals to remote slots
+        const slotMap = {};
+        const unmapped = [];
+        for (const sig of data.signals) {
+            const slot = mapSignalToSlot(sig.name);
+            if (slot && !slotMap[slot]) {
+                slotMap[slot] = sig;
+            } else {
+                unmapped.push(sig);
+            }
+        }
+
+        function btn(slotId, label, cls) {
+            const sig = slotMap[slotId];
+            if (sig) {
+                return `<button class="ir-rmt-btn mapped ${cls || ''}" onclick="replaySignal('${sig.id}')" title="${esc(sig.name)}&#10;${esc(sig.protocol)} ${esc(sig.address)} ${esc(sig.command)}"><span class="rmt-label">${label}</span><span class="rmt-delete" onclick="event.stopPropagation();deleteSignal('${sig.id}')">&times;</span></button>`;
+            }
+            return `<button class="ir-rmt-btn empty ${cls || ''}" disabled><span class="rmt-label">${label}</span></button>`;
+        }
+
+        let html = '<div class="ir-remote">';
+
+        // Power row
+        html += '<div class="ir-rmt-row">';
+        html += btn('power', 'PWR', 'rmt-power');
+        html += '<span class="rmt-spacer"></span>';
+        html += btn('source', 'SRC');
+        html += btn('mute', 'MUTE');
+        html += '</div>';
+
+        html += '<div class="ir-rmt-divider"></div>';
+
+        // Number pad
+        html += '<div class="ir-rmt-numpad">';
+        for (let i = 1; i <= 9; i++) html += btn('num' + i, '' + i);
+        html += '<div></div>';
+        html += btn('num0', '0');
+        html += '<div></div>';
+        html += '</div>';
+
+        html += '<div class="ir-rmt-divider"></div>';
+
+        // Vol | D-pad | Ch
+        html += '<div class="ir-rmt-nav">';
+        html += '<div class="ir-rmt-strip">' + btn('vol_up', 'V+') + btn('vol_down', 'V\u2212') + '</div>';
+        html += '<div class="ir-rmt-dpad">';
+        html += '<div></div>' + btn('up', '\u25B2', 'rmt-arrow') + '<div></div>';
+        html += btn('left', '\u25C0', 'rmt-arrow') + btn('ok', 'OK', 'rmt-ok') + btn('right', '\u25B6', 'rmt-arrow');
+        html += '<div></div>' + btn('down', '\u25BC', 'rmt-arrow') + '<div></div>';
+        html += '</div>';
+        html += '<div class="ir-rmt-strip">' + btn('ch_up', 'CH+') + btn('ch_down', 'CH\u2212') + '</div>';
+        html += '</div>';
+
+        html += '<div class="ir-rmt-divider"></div>';
+
+        // Function row
+        html += '<div class="ir-rmt-row">';
+        html += btn('menu', 'MENU');
+        html += btn('home', 'HOME');
+        html += btn('info', 'INFO');
+        html += '</div>';
+
+        // Back / Exit
+        html += '<div class="ir-rmt-row">';
+        html += btn('back', 'BACK');
+        html += '<span class="rmt-spacer"></span>';
+        html += btn('exit', 'EXIT');
+        html += '</div>';
+
+        // Guide / Tools (only if mapped)
+        if (slotMap['guide'] || slotMap['tools']) {
+            html += '<div class="ir-rmt-row">';
+            if (slotMap['guide']) html += btn('guide', 'GUIDE');
+            if (slotMap['tools']) html += btn('tools', 'TOOLS');
+            html += '</div>';
+        }
+
+        html += '</div>'; // .ir-remote
+
+        // Overflow: unmapped signals
+        if (unmapped.length > 0) {
+            html += '<div class="ir-rmt-overflow">';
+            html += `<div class="ir-rmt-overflow-title">Other (${unmapped.length})</div>`;
+            unmapped.forEach(sig => {
+                html += `<div class="saved-signal">
+                    <button class="btn btn-sm btn-primary saved-signal-play" onclick="replaySignal('${sig.id}')" title="Transmit">&#9654;</button>
+                    <div class="saved-signal-info">
+                        <span class="saved-signal-name">${esc(sig.name)}</span>
+                        <span class="saved-signal-detail">${esc(sig.protocol)} ${esc(sig.address)} ${esc(sig.command)}</span>
+                    </div>
+                    <button class="btn btn-sm btn-danger" onclick="deleteSignal('${sig.id}')" title="Delete">&times;</button>
+                </div>`;
+            });
+            html += '</div>';
+        }
+
         container.innerHTML = html;
     } catch (e) {
         container.innerHTML = `<div style="color: var(--red); font-size: 12px; padding: 8px;">${esc(e.message)}</div>`;
@@ -978,8 +1107,19 @@ async function replaySignal(id) {
         // Brief flash feedback on the button
         const btn = document.querySelector(`[onclick="replaySignal('${id}')"]`);
         if (btn) {
-            btn.textContent = "\u2713";
-            setTimeout(() => { btn.innerHTML = "&#9654;"; }, 600);
+            if (btn.classList.contains('ir-rmt-btn')) {
+                // Remote layout button: flash green
+                const origBg = btn.style.background;
+                const origBorder = btn.style.borderColor;
+                btn.style.background = 'var(--green)';
+                btn.style.borderColor = 'var(--green)';
+                btn.style.color = '#000';
+                setTimeout(() => { btn.style.background = origBg; btn.style.borderColor = origBorder; btn.style.color = ''; }, 400);
+            } else {
+                // Play button in overflow list
+                btn.textContent = "\u2713";
+                setTimeout(() => { btn.innerHTML = "&#9654;"; }, 600);
+            }
         }
     } catch (e) {
         alert(`Transmit failed: ${e.message}`);

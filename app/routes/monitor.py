@@ -22,22 +22,18 @@ async def monitor_websocket(ws: WebSocket):
         while True:
             try:
                 if flipper.connected:
-                    # Get device info
-                    info = await flipper.send_command("device_info", timeout=3.0)
                     await ws.send_json({
                         "type": "status",
                         "connected": True,
-                        "info": info,
                     })
                 else:
                     await ws.send_json({
                         "type": "status",
                         "connected": False,
-                        "info": None,
                     })
             except Exception as e:
                 await ws.send_json({"type": "error", "message": str(e)})
-            await asyncio.sleep(2.0)
+            await asyncio.sleep(15.0)
 
     poll_task = asyncio.create_task(poll_status())
 

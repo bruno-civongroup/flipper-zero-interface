@@ -738,9 +738,9 @@ header h1 {
 }
 
 .ir-saved-panel {
-    width: 220px;
-    min-width: 180px;
-    border-right: 1px solid var(--border);
+    width: 300px;
+    min-width: 280px;
+    border-left: 1px solid var(--border);
     display: flex;
     flex-direction: column;
     flex-shrink: 0;
@@ -942,6 +942,190 @@ header h1 {
     align-items: center;
     gap: 8px;
     flex-shrink: 0;
+}
+
+/* ── IR Remote Visual Layout ── */
+.ir-remote {
+    background: linear-gradient(180deg, #161616 0%, #0e0e0e 100%);
+    border-radius: 20px 20px 36px 36px;
+    padding: 16px 12px 24px;
+    margin: 8px;
+    border: 2px solid #2a2a2a;
+    box-shadow: inset 0 1px 0 rgba(255,255,255,0.03);
+}
+
+.ir-rmt-row {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 4px;
+    margin-bottom: 8px;
+}
+
+.rmt-spacer { flex: 1; }
+
+.ir-rmt-btn {
+    min-width: 50px;
+    height: 32px;
+    padding: 0 6px;
+    font-family: inherit;
+    font-size: 10px;
+    font-weight: 700;
+    border: 1px solid #333;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: all 0.12s;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+    letter-spacing: 0.5px;
+    user-select: none;
+    -webkit-user-select: none;
+}
+
+.ir-rmt-btn.mapped {
+    background: var(--surface-2);
+    color: var(--text);
+}
+
+.ir-rmt-btn.mapped:hover {
+    background: var(--orange);
+    color: #000;
+    border-color: var(--orange);
+}
+
+.ir-rmt-btn.mapped:active {
+    transform: scale(0.93);
+}
+
+.ir-rmt-btn.empty {
+    background: #0a0a0a;
+    color: #222;
+    border-color: #191919;
+    cursor: default;
+}
+
+/* Power button */
+.ir-rmt-btn.rmt-power.mapped {
+    background: #2a1010;
+    border-color: #442020;
+    color: var(--red);
+}
+
+.ir-rmt-btn.rmt-power.mapped:hover {
+    background: var(--red);
+    color: #fff;
+    border-color: var(--red);
+}
+
+/* OK button */
+.ir-rmt-btn.rmt-ok {
+    border-radius: 50%;
+    width: 44px;
+    height: 44px;
+    min-width: 44px;
+}
+
+.ir-rmt-btn.rmt-ok.mapped {
+    background: var(--orange-dim);
+    color: #000;
+    border-color: var(--orange);
+    font-weight: 800;
+}
+
+.ir-rmt-btn.rmt-ok.mapped:hover {
+    background: var(--orange);
+}
+
+/* Arrow buttons */
+.ir-rmt-btn.rmt-arrow {
+    min-width: 36px;
+    font-size: 14px;
+}
+
+/* Number pad grid */
+.ir-rmt-numpad {
+    display: grid;
+    grid-template-columns: repeat(3, 50px);
+    gap: 4px;
+    justify-content: center;
+    margin-bottom: 12px;
+}
+
+/* Navigation area: Vol | D-pad | Ch */
+.ir-rmt-nav {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 6px;
+    margin-bottom: 12px;
+}
+
+.ir-rmt-strip {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.ir-rmt-dpad {
+    display: grid;
+    grid-template-columns: 36px 44px 36px;
+    grid-template-rows: 32px 44px 32px;
+    gap: 2px;
+    justify-content: center;
+}
+
+.ir-rmt-dpad .ir-rmt-btn {
+    min-width: unset;
+    width: 100%;
+    height: 100%;
+}
+
+/* Delete overlay on hover */
+.rmt-delete {
+    position: absolute;
+    top: -5px;
+    right: -5px;
+    width: 14px;
+    height: 14px;
+    background: var(--red);
+    color: #fff;
+    font-size: 9px;
+    font-weight: 400;
+    border-radius: 50%;
+    display: none;
+    align-items: center;
+    justify-content: center;
+    line-height: 1;
+    z-index: 2;
+    border: 1px solid #000;
+}
+
+.ir-rmt-btn:hover .rmt-delete {
+    display: flex;
+}
+
+/* Overflow signals below remote */
+.ir-rmt-overflow {
+    margin: 0 8px;
+    border-top: 1px solid #2a2a2a;
+    padding-top: 8px;
+}
+
+.ir-rmt-overflow-title {
+    font-size: 9px;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    color: #555;
+    text-align: center;
+    margin-bottom: 6px;
+}
+
+/* Section divider line */
+.ir-rmt-divider {
+    border-top: 1px solid #222;
+    margin: 4px 12px 8px;
 }
 
 /* ── Tab bar overflow (8 tabs) ── */
