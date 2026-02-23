@@ -3,351 +3,189 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Flipper Zero Interface</title>
-    <link rel="stylesheet" href="style.css">
+    <title>Projects — Bruno Malnovic</title>
+    <meta name="description" content="Tools and experiments by Bruno Malnovic.">
+    <link rel="canonical" href="https://projects.brunomalnovic.com/">
+    <meta property="og:title" content="Projects — Bruno Malnovic">
+    <meta property="og:description" content="Tools and experiments by Bruno Malnovic.">
+    <meta property="og:url" content="https://projects.brunomalnovic.com/">
+    <meta property="og:type" content="website">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;500&family=Inter:wght@300;400&display=swap" rel="stylesheet">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: #0a0a0f;
+            color: #e0e0e0;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 2rem;
+            overflow-x: hidden;
+        }
+
+        body::before {
+            content: '';
+            position: fixed;
+            inset: 0;
+            background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.03'/%3E%3C/svg%3E");
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        body::after {
+            content: '';
+            position: fixed;
+            top: 30%;
+            left: 50%;
+            width: 600px;
+            height: 600px;
+            background: radial-gradient(circle, rgba(224, 153, 0, 0.06) 0%, transparent 70%);
+            transform: translate(-50%, -50%);
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        .container {
+            max-width: 560px;
+            width: 100%;
+            text-align: center;
+            position: relative;
+            z-index: 1;
+            animation: fadeIn 0.8s ease-out;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(16px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        h1 {
+            font-family: 'Cinzel', Georgia, serif;
+            font-size: 2.4rem;
+            font-weight: 400;
+            letter-spacing: 0.08em;
+            color: #d4a030;
+            margin-bottom: 0.8rem;
+        }
+
+        .rule {
+            width: 60px;
+            height: 1px;
+            background: linear-gradient(90deg, transparent, #d4a030, transparent);
+            margin: 0 auto 1rem;
+        }
+
+        .subtitle {
+            font-size: 0.95rem;
+            font-weight: 300;
+            color: #7a7a8a;
+            margin-bottom: 2.8rem;
+            letter-spacing: 0.03em;
+        }
+
+        .project-card {
+            display: block;
+            padding: 1.6rem 1.8rem;
+            border: 1px solid rgba(212, 168, 48, 0.2);
+            border-radius: 6px;
+            background: rgba(212, 168, 48, 0.03);
+            text-decoration: none;
+            color: inherit;
+            text-align: left;
+            transition: all 0.3s ease;
+            position: relative;
+            margin-bottom: 2.8rem;
+        }
+
+        .project-card:hover {
+            background: rgba(212, 168, 48, 0.08);
+            border-color: rgba(212, 168, 48, 0.45);
+            box-shadow: 0 0 24px rgba(212, 168, 48, 0.06);
+            transform: translateY(-2px);
+        }
+
+        .project-card .arrow {
+            position: absolute;
+            right: 1.6rem;
+            top: 50%;
+            transform: translateY(-50%);
+            font-size: 1.2rem;
+            color: #d4a030;
+            opacity: 0.5;
+            transition: all 0.3s ease;
+        }
+
+        .project-card:hover .arrow {
+            opacity: 1;
+            transform: translateY(-50%) translateX(3px);
+        }
+
+        .project-card .title {
+            font-family: 'Cinzel', Georgia, serif;
+            font-size: 1.15rem;
+            font-weight: 500;
+            color: #e0e0e0;
+            margin-bottom: 0.5rem;
+            letter-spacing: 0.04em;
+        }
+
+        .project-card .desc {
+            font-size: 0.85rem;
+            font-weight: 300;
+            color: #7a7a8a;
+            line-height: 1.6;
+            padding-right: 2rem;
+        }
+
+        .divider {
+            width: 100%;
+            height: 1px;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.06), transparent);
+            margin-bottom: 1.5rem;
+        }
+
+        .footer {
+            font-size: 0.75rem;
+            color: #444;
+            letter-spacing: 0.05em;
+        }
+
+        .footer a {
+            color: #555;
+            text-decoration: none;
+            transition: color 0.3s ease;
+        }
+
+        .footer a:hover {
+            color: #d4a030;
+        }
+
+        @media (max-width: 480px) {
+            h1 { font-size: 1.8rem; }
+            .project-card { padding: 1.2rem 1.4rem; }
+        }
+    </style>
 </head>
 <body>
-    <header>
-        <h1>FLIPPER ZERO INTERFACE</h1>
-        <div style="display: flex; align-items: center; gap: 16px;">
-            <div class="status-badge">
-                <div class="status-dot" id="statusDot"></div>
-                <span id="statusText">Disconnected</span>
-            </div>
-            <span class="shortcut-hint">Ctrl+1-8 tabs &middot; Ctrl+/ terminal &middot; Ctrl+K connect</span>
-        </div>
-    </header>
+    <div class="container">
+        <h1>Projects</h1>
+        <div class="rule"></div>
+        <p class="subtitle">Tools and experiments</p>
 
-    <div class="main-layout">
-        <!-- Sidebar -->
-        <div class="panel sidebar">
-            <div class="panel-header">Connection</div>
-            <div class="connect-section">
-                <button class="btn btn-primary" id="connectBtn">Connect Flipper</button>
-            </div>
+        <a href="/flipper/" class="project-card">
+            <div class="title">Flipper Zero Interface</div>
+            <div class="desc">Web-based serial terminal and file manager for Flipper Zero. Connect via WebSerial to browse files, run commands, and manage your device.</div>
+            <span class="arrow">&rsaquo;</span>
+        </a>
 
-            <div class="panel-header">Dashboard</div>
-            <div class="panel-body quick-commands">
-                <button class="btn btn-sm btn-quick active" data-cmd="device_info" data-label="Device Info">Device Info</button>
-                <button class="btn btn-sm btn-quick" data-cmd="power info" data-label="Power">Power</button>
-                <button class="btn btn-sm btn-quick" data-cmd="bt info" data-label="Bluetooth">Bluetooth</button>
-                <button class="btn btn-sm btn-quick" data-cmd="storage info /ext" data-label="SD Card">SD Card</button>
-                <button class="btn btn-sm btn-quick" data-cmd="ps" data-label="Processes">Processes</button>
-                <button class="btn btn-sm btn-quick" data-cmd="free" data-label="Memory">Memory</button>
-                <button class="btn btn-sm btn-quick" data-cmd="uptime" data-label="Uptime">Uptime</button>
-            </div>
-
-            <!-- Info output in sidebar -->
-            <div class="sidebar-info">
-                <div class="sidebar-info-header">
-                    <span id="infoPanelTitle">Device Info</span>
-                    <button class="btn btn-sm btn-primary" id="refreshInfoBtn">Refresh</button>
-                </div>
-                <div class="sidebar-info-output" id="infoOutput">
-                    <div class="info-placeholder">Connect to Flipper to view device info</div>
-                </div>
-            </div>
-        </div>
-
-        <!-- Right panel — tabbed: Terminal / File Browser / WiFi -->
-        <div class="panel bottom-panel">
-            <div class="tab-bar">
-                <button class="tab active" data-tab="terminal">Terminal</button>
-                <button class="tab" data-tab="files">File Browser</button>
-                <button class="tab" data-tab="wifi">WiFi Scanner</button>
-                <button class="tab" data-tab="subghz">Sub-GHz</button>
-                <button class="tab" data-tab="nfcrfid">NFC / RFID</button>
-                <button class="tab" data-tab="ir">Infrared</button>
-                <button class="tab" data-tab="remote">Remote</button>
-                <button class="tab" data-tab="screen">Screen</button>
-                <div class="tab-actions">
-                    <button class="btn btn-sm btn-danger" id="clearTermBtn" style="display: inline;">Clear</button>
-                    <button class="btn btn-sm btn-primary" id="exportTermBtn" style="display: none;">Export</button>
-                    <button class="btn btn-sm btn-primary" id="mkdirBtn" style="display: none;">New Folder</button>
-                    <button class="btn btn-sm btn-primary" id="refreshFilesBtn" style="display: none;">Refresh</button>
-                </div>
-            </div>
-
-            <!-- Terminal tab -->
-            <div class="tab-content active" id="tab-terminal">
-                <div class="terminal-output" id="terminalOutput">
-                    <div class="sys">Welcome. Type CLI commands below or use the dashboard buttons above.</div>
-                </div>
-                <div class="terminal-input">
-                    <span>&gt;</span>
-                    <input type="text" id="terminalInput" placeholder="Enter CLI command..." autofocus>
-                </div>
-            </div>
-
-            <!-- File Browser tab -->
-            <div class="tab-content" id="tab-files">
-                <div class="files-body">
-                    <div class="breadcrumb" id="breadcrumb"></div>
-                    <ul class="file-list" id="fileList">
-                        <li style="color: var(--text-dim)">Connect to Flipper to browse files</li>
-                    </ul>
-                    <div class="upload-zone" id="uploadZone">
-                        Drop files here to upload, or click to select
-                        <input type="file" id="fileInput" style="display: none" multiple>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Sub-GHz tab -->
-            <div class="tab-content" id="tab-subghz">
-                <div class="wifi-toolbar">
-                    <div class="wifi-connection">
-                        <select class="port-select" id="subghzFreqSelect" style="width: auto; min-width: 200px; margin-bottom: 0;">
-                            <option value="315000000">315 MHz — US garage doors</option>
-                            <option value="433920000" selected>433.92 MHz — Remotes, weather stations</option>
-                            <option value="868350000">868.35 MHz — EU smart home</option>
-                            <option value="915000000">915 MHz — US ISM / LoRa</option>
-                        </select>
-                        <select class="port-select" id="subghzDuration" style="width: auto; min-width: 120px; margin-bottom: 0;">
-                            <option value="10">10 sec</option>
-                            <option value="20" selected>20 sec</option>
-                            <option value="30">30 sec</option>
-                            <option value="45">45 sec</option>
-                            <option value="60">60 sec</option>
-                        </select>
-                    </div>
-                    <div class="wifi-actions">
-                        <button class="btn btn-sm btn-primary" id="subghzListenBtn">Listen</button>
-                        <button class="btn btn-sm btn-primary" id="subghzListenRawBtn">Listen RAW</button>
-                    </div>
-                </div>
-                <div class="subghz-split">
-                    <div class="wifi-results" id="subghzResults">
-                        <div class="info-placeholder">
-                            Listen for Sub-GHz signals (remotes, garage doors, weather stations, doorbells).<br><br>
-                            <span style="color: var(--text-dim); font-size: 12px;">
-                                Select a frequency and duration, then click "Listen". Uses the Flipper's built-in CC1101 radio.
-                                Press a remote or trigger a device during the listen window to capture its signal.
-                            </span>
-                        </div>
-                    </div>
-                    <div class="subghz-saved-panel">
-                        <div class="panel-header" style="padding: 8px 12px; font-size: 11px;">Saved Signals</div>
-                        <div class="subghz-saved-list" id="subghzSavedSignals">
-                            <div style="color: var(--text-dim); font-size: 12px; padding: 16px; text-align: center;">No saved signals yet.<br><br>Capture signals with Listen, then save them here.</div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- NFC / RFID tab -->
-            <div class="tab-content" id="tab-nfcrfid">
-                <div class="wifi-toolbar">
-                    <div class="wifi-connection">
-                        <select class="port-select" id="nfcrfidMode" style="width: auto; min-width: 200px; margin-bottom: 0;">
-                            <option value="nfc">NFC (13.56 MHz) — badges, phones, NTAG, Mifare</option>
-                            <option value="rfid">RFID (125 kHz) — keycards, EM4100, HID</option>
-                            <option value="rfid_indala">RFID Indala (PSK) — Indala cards</option>
-                        </select>
-                        <select class="port-select" id="nfcrfidDuration" style="width: auto; min-width: 100px; margin-bottom: 0;">
-                            <option value="10" selected>10 sec</option>
-                            <option value="20">20 sec</option>
-                            <option value="30">30 sec</option>
-                        </select>
-                    </div>
-                    <div class="wifi-actions">
-                        <button class="btn btn-sm btn-primary" id="nfcrfidScanBtn">Scan</button>
-                    </div>
-                </div>
-                <div class="nfcrfid-split">
-                    <div class="wifi-results" id="nfcrfidResults">
-                        <div class="info-placeholder">
-                            Read NFC tags (13.56 MHz) or RFID cards (125 kHz).<br><br>
-                            <span style="color: var(--text-dim); font-size: 12px;">
-                                Select the type, click "Scan", then hold the tag/card against the back of the Flipper.
-                                NFC reads badges, transit cards, NTAG stickers, Mifare, and phone NFC.
-                                RFID reads keycards, EM4100, HID ProxCards, and other 125 kHz cards.
-                            </span>
-                        </div>
-                    </div>
-                    <div class="nfcrfid-saved-panel">
-                        <div class="panel-header" style="padding: 8px 12px; font-size: 11px;">Saved Tags</div>
-                        <div class="nfcrfid-saved-list" id="nfcrfidSavedSignals">
-                            <div style="color: var(--text-dim); font-size: 12px; padding: 16px; text-align: center;">No saved tags yet.<br><br>Scan NFC/RFID tags, then save them here.</div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- WiFi Scanner tab -->
-            <div class="tab-content" id="tab-wifi">
-                <div class="wifi-toolbar">
-                    <div class="wifi-connection">
-                        <div class="status-badge">
-                            <div class="status-dot" id="marauderStatusDot"></div>
-                            <span id="marauderStatusText" style="font-size: 12px;">Bridge via Flipper UART</span>
-                        </div>
-                        <button class="btn btn-sm btn-primary" id="marauderConnectBtn" style="display: none;">Connect ESP32 USB</button>
-                    </div>
-                    <div class="wifi-actions">
-                        <button class="btn btn-sm btn-primary" id="scanApBtn">Scan APs</button>
-                        <button class="btn btn-sm btn-primary" id="scanStaBtn">Scan Stations</button>
-                        <button class="btn btn-sm btn-danger" id="stopScanBtn">Stop</button>
-                    </div>
-                    <div class="wifi-connection" style="margin-top: 4px;">
-                        <input type="text" id="marauderRawInput" class="port-select" style="flex: 1; min-width: 200px; margin-bottom: 0;" placeholder="Raw Marauder command (e.g. sniffbeacon, channel 6)">
-                        <button class="btn btn-sm btn-primary" id="marauderRawBtn">Send</button>
-                    </div>
-                </div>
-                <div class="wifi-results" id="wifiResults">
-                    <div class="info-placeholder">
-                        WiFi scanning via Marauder (ESP32 Dev Board over UART).<br><br>
-                        <span style="color: var(--text-dim); font-size: 12px;">
-                            Make sure your Flipper is connected above, then click "Scan APs" to find nearby networks.
-                            Scans take ~10 seconds as commands are routed through the Flipper's UART to the ESP32.
-                        </span>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Infrared tab -->
-            <div class="tab-content" id="tab-ir">
-                <div class="wifi-toolbar">
-                    <div class="wifi-connection">
-                        <select class="port-select" id="irMode" style="width: auto; min-width: 180px; margin-bottom: 0;">
-                            <option value="decoded">Learn (Decoded)</option>
-                            <option value="raw">Learn (RAW)</option>
-                        </select>
-                        <select class="port-select" id="irDuration" style="width: auto; min-width: 100px; margin-bottom: 0;">
-                            <option value="10" selected>10 sec</option>
-                            <option value="15">15 sec</option>
-                            <option value="20">20 sec</option>
-                            <option value="30">30 sec</option>
-                        </select>
-                        <button class="btn btn-sm btn-primary" id="irLearnBtn">Learn</button>
-                    </div>
-                    <div class="wifi-connection" style="margin-top: 4px;">
-                        <select class="port-select" id="irProtocol" style="width: auto; min-width: 120px; margin-bottom: 0;">
-                            <option value="NEC" selected>NEC</option>
-                            <option value="NECext">NECext</option>
-                            <option value="Samsung32">Samsung32</option>
-                            <option value="RC5">RC5</option>
-                            <option value="RC6">RC6</option>
-                            <option value="SIRC">SIRC</option>
-                            <option value="SIRC15">SIRC15</option>
-                            <option value="SIRC20">SIRC20</option>
-                            <option value="Kaseikyo">Kaseikyo</option>
-                            <option value="RCA">RCA</option>
-                        </select>
-                        <input type="text" id="irAddress" class="port-select" style="width: 80px; min-width: 80px; margin-bottom: 0;" placeholder="Address">
-                        <input type="text" id="irCommand" class="port-select" style="width: 80px; min-width: 80px; margin-bottom: 0;" placeholder="Command">
-                        <button class="btn btn-sm btn-primary" id="irTransmitBtn">Transmit</button>
-                    </div>
-                    <div class="wifi-connection" style="margin-top: 4px;">
-                        <span style="font-size: 12px; color: var(--text-dim); margin-right: 4px;">Universal:</span>
-                        <select class="port-select" id="irUniversalType" style="width: auto; min-width: 100px; margin-bottom: 0;">
-                            <option value="tv" selected>TV</option>
-                            <option value="ac">AC</option>
-                            <option value="audio">Audio</option>
-                        </select>
-                        <div class="ir-universal-buttons" id="irUniversalButtons"></div>
-                        <button class="btn btn-sm btn-primary" id="irdbOpenBtn" style="margin-left: auto;">Import from IRDB</button>
-                    </div>
-                </div>
-                <div class="ir-split">
-                    <div class="wifi-results" id="irResults">
-                        <div class="info-placeholder">
-                            Learn and transmit infrared signals (TV, AC, Audio remotes).<br><br>
-                            <span style="color: var(--text-dim); font-size: 12px;">
-                                Point a remote at the Flipper's IR receiver and click "Learn" to capture signals.
-                                Use "Transmit" to replay captured signals, or use the Universal Remote buttons.
-                            </span>
-                        </div>
-                    </div>
-                    <div class="ir-saved-panel">
-                        <div class="panel-header" style="padding: 8px 12px; font-size: 11px;">Remote</div>
-                        <div class="ir-saved-list" id="irSavedSignals">
-                            <div style="color: var(--text-dim); font-size: 12px; padding: 16px; text-align: center;">No signals yet.<br><br>Capture signals with Learn or import from IRDB.</div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Remote Control tab -->
-            <div class="tab-content" id="tab-remote">
-                <div class="remote-body">
-                    <div class="info-placeholder" style="margin-bottom: 16px; text-align: center; padding: 8px;">
-                        Virtual D-pad &mdash; click to send short press, hold 500ms+ for long press
-                    </div>
-                    <div class="dpad-container">
-                        <div class="dpad-grid">
-                            <div class="dpad-spacer"></div>
-                            <button class="btn dpad-btn" data-key="up">&#9650;</button>
-                            <div class="dpad-spacer"></div>
-                            <button class="btn dpad-btn" data-key="left">&#9664;</button>
-                            <button class="btn dpad-btn dpad-ok" data-key="ok">OK</button>
-                            <button class="btn dpad-btn" data-key="right">&#9654;</button>
-                            <div class="dpad-spacer"></div>
-                            <button class="btn dpad-btn" data-key="down">&#9660;</button>
-                            <div class="dpad-spacer"></div>
-                        </div>
-                        <button class="btn dpad-btn dpad-back" data-key="back">BACK</button>
-                    </div>
-                    <div class="remote-log" id="remoteLog"></div>
-                </div>
-            </div>
-
-            <!-- Screen Mirror tab -->
-            <div class="tab-content" id="tab-screen">
-                <div class="wifi-toolbar">
-                    <div class="wifi-connection">
-                        <button class="btn btn-sm btn-primary" id="screenStartBtn">Start Mirror</button>
-                        <button class="btn btn-sm btn-danger" id="screenStopBtn" disabled>Stop Mirror</button>
-                        <button class="btn btn-sm" id="screenShotBtn" disabled title="Save screenshot">&#128247;</button>
-                        <div class="status-badge" style="margin-left: 8px;">
-                            <div class="status-dot" id="screenStatusDot"></div>
-                            <span id="screenStatusText" style="font-size: 12px;">Stopped</span>
-                        </div>
-                        <span id="screenFps" style="font-size: 12px; color: var(--text-dim); margin-left: 8px;"></span>
-                    </div>
-                </div>
-                <div class="screen-mirror-body">
-                    <canvas id="screenCanvas"></canvas>
-                    <div class="screen-placeholder" id="screenPlaceholder">
-                        Click "Start Mirror" to stream the Flipper's LCD screen in real time.<br><br>
-                        <span style="color: var(--text-dim); font-size: 12px;">
-                            The display is 128x64 pixels, auto-scaled to fit. Frame rate is typically 3-5 FPS
-                            depending on serial throughput.
-                        </span>
-                    </div>
-                </div>
-            </div>
-        </div>
+        <div class="divider"></div>
+        <p class="footer"><a href="https://brunomalnovic.com">brunomalnovic.com</a></p>
     </div>
-
-    <!-- IRDB Import Modal -->
-    <div class="irdb-overlay" id="irdbOverlay" style="display: none;">
-        <div class="irdb-modal">
-            <div class="irdb-header">
-                <span>Flipper IRDB</span>
-                <button class="btn btn-sm btn-danger" id="irdbCloseBtn">&times;</button>
-            </div>
-            <div class="irdb-breadcrumb" id="irdbBreadcrumb"></div>
-            <div class="irdb-body" id="irdbBody">
-                <div class="scan-status"><span class="spinner"></span> Loading categories...</div>
-            </div>
-        </div>
-    </div>
-
-    <!-- Browser compatibility check (hidden by default, shown by JS if Web Serial unsupported) -->
-    <div id="browserCheck" style="display: none; position: fixed; inset: 0; background: var(--bg); z-index: 9999; align-items: center; justify-content: center;">
-        <div style="text-align: center; max-width: 500px; padding: 40px;">
-            <h2 style="color: var(--orange); margin-bottom: 16px;">Browser Not Supported</h2>
-            <p style="color: var(--text-dim); line-height: 1.8;">
-                This app requires the <strong style="color: var(--text);">Web Serial API</strong>, which is only available in
-                <strong style="color: var(--text);">Chrome</strong> and <strong style="color: var(--text);">Edge</strong> (desktop).
-            </p>
-            <p style="color: var(--text-dim); margin-top: 12px;">Firefox and Safari do not support Web Serial.</p>
-        </div>
-    </div>
-
-    <div id="toastContainer" class="toast-container"></div>
-
-    <script type="module" src="js/app.js"></script>
 </body>
 </html>
