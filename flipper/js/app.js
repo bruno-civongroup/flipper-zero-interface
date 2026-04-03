@@ -123,6 +123,11 @@ function esc(str) {
   return d.innerHTML;
 }
 
+function escJs(str) {
+  return String(str).replace(/\/g, '\\').replace(/"/g, '\\"').replace(/'/g, "\'").replace(/
+/g, '\n');
+}
+
 function formatSize(bytes) {
   if (bytes < 1024) return `${bytes}B`;
   if (bytes < 1024 * 1024) return `${(bytes / 1024).toFixed(1)}KB`;
@@ -774,7 +779,7 @@ async function sendRawMarauder() {
 serial.setup("usart", 115200);
 delay(200);
 serial.readAny(200);
-serial.write("${cmd}\\n");
+serial.write("${escJs(cmd)}\\n");
 delay(3000);
 let out = "";
 let c = serial.readAny(500);
@@ -921,7 +926,7 @@ async function nfcrfidScan() {
   document.getElementById('nfcrfidScanBtn').disabled = true;
 
   try {
-    let raw, data;
+    let raw;
     if (mode === 'nfc') {
       raw = await flipper.sendNfcCommand('scanner', dur * 1000);
       const tags = parseNfcScanner(raw);
