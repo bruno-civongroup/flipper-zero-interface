@@ -1,0 +1,804 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CrossFeed User Guide</title>
+    <meta name="description" content="Step-by-step guide to using CrossFeed — display your social media content on any website.">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        :root {
+            --cf-blue: #0ea5e9;
+            --cf-blue-dim: rgba(14, 165, 233, 0.15);
+            --cf-blue-glow: rgba(14, 165, 233, 0.3);
+            --cf-bg: #0b1120;
+            --cf-surface: #111827;
+            --cf-surface-2: #1e293b;
+            --cf-border: rgba(255, 255, 255, 0.08);
+            --cf-text: #e2e8f0;
+            --cf-text-dim: #94a3b8;
+            --cf-text-faint: #64748b;
+            --cf-green: #22c55e;
+            --cf-orange: #f59e0b;
+            --cf-red: #ef4444;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: var(--cf-bg);
+            color: var(--cf-text);
+            line-height: 1.7;
+            -webkit-font-smoothing: antialiased;
+        }
+
+        /* Nav */
+        .nav {
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            background: rgba(11, 17, 32, 0.85);
+            backdrop-filter: blur(12px);
+            border-bottom: 1px solid var(--cf-border);
+            padding: 0.75rem 2rem;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .nav-logo {
+            font-size: 1.1rem;
+            font-weight: 700;
+            color: var(--cf-text);
+            text-decoration: none;
+            letter-spacing: -0.02em;
+        }
+
+        .nav-logo span { color: var(--cf-blue); }
+
+        .nav-back {
+            font-size: 0.8rem;
+            color: var(--cf-text-dim);
+            text-decoration: none;
+            transition: color 0.2s;
+        }
+
+        .nav-back:hover { color: var(--cf-blue); }
+
+        /* Hero */
+        .hero {
+            text-align: center;
+            padding: 4rem 2rem 3rem;
+            background: linear-gradient(180deg, rgba(14, 165, 233, 0.06) 0%, transparent 100%);
+        }
+
+        .hero-badge {
+            display: inline-block;
+            padding: 0.3rem 0.9rem;
+            background: var(--cf-blue-dim);
+            border: 1px solid rgba(14, 165, 233, 0.25);
+            border-radius: 20px;
+            font-size: 0.75rem;
+            font-weight: 500;
+            color: var(--cf-blue);
+            letter-spacing: 0.05em;
+            text-transform: uppercase;
+            margin-bottom: 1.2rem;
+        }
+
+        .hero h1 {
+            font-size: 2.4rem;
+            font-weight: 700;
+            letter-spacing: -0.03em;
+            margin-bottom: 0.8rem;
+        }
+
+        .hero p {
+            font-size: 1.05rem;
+            color: var(--cf-text-dim);
+            max-width: 520px;
+            margin: 0 auto;
+        }
+
+        /* Content */
+        .content {
+            max-width: 720px;
+            margin: 0 auto;
+            padding: 0 2rem 4rem;
+        }
+
+        /* TOC */
+        .toc {
+            background: var(--cf-surface);
+            border: 1px solid var(--cf-border);
+            border-radius: 10px;
+            padding: 1.5rem 2rem;
+            margin-bottom: 3rem;
+        }
+
+        .toc-title {
+            font-size: 0.75rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.08em;
+            color: var(--cf-text-faint);
+            margin-bottom: 0.8rem;
+        }
+
+        .toc ol {
+            list-style: none;
+            counter-reset: toc;
+        }
+
+        .toc li {
+            counter-increment: toc;
+            margin-bottom: 0.4rem;
+        }
+
+        .toc li a {
+            color: var(--cf-text-dim);
+            text-decoration: none;
+            font-size: 0.9rem;
+            transition: color 0.2s;
+            display: flex;
+            align-items: center;
+            gap: 0.6rem;
+        }
+
+        .toc li a::before {
+            content: counter(toc);
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 22px;
+            height: 22px;
+            border-radius: 50%;
+            background: var(--cf-blue-dim);
+            color: var(--cf-blue);
+            font-size: 0.7rem;
+            font-weight: 600;
+            flex-shrink: 0;
+        }
+
+        .toc li a:hover { color: var(--cf-blue); }
+
+        /* Steps */
+        .step {
+            margin-bottom: 3rem;
+            scroll-margin-top: 4rem;
+        }
+
+        .step-header {
+            display: flex;
+            align-items: center;
+            gap: 0.8rem;
+            margin-bottom: 1.2rem;
+        }
+
+        .step-number {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            background: var(--cf-blue);
+            color: #fff;
+            font-size: 0.9rem;
+            font-weight: 700;
+            flex-shrink: 0;
+        }
+
+        .step h2 {
+            font-size: 1.35rem;
+            font-weight: 600;
+            letter-spacing: -0.02em;
+        }
+
+        .step p {
+            color: var(--cf-text-dim);
+            margin-bottom: 1rem;
+            font-size: 0.95rem;
+        }
+
+        .step ul, .step ol {
+            color: var(--cf-text-dim);
+            margin-bottom: 1rem;
+            padding-left: 1.5rem;
+            font-size: 0.95rem;
+        }
+
+        .step li { margin-bottom: 0.5rem; }
+        .step li strong { color: var(--cf-text); }
+
+        /* Code blocks */
+        .code-block {
+            background: var(--cf-surface);
+            border: 1px solid var(--cf-border);
+            border-radius: 8px;
+            padding: 1rem 1.2rem;
+            margin-bottom: 1rem;
+            overflow-x: auto;
+            position: relative;
+        }
+
+        .code-block code {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.82rem;
+            line-height: 1.8;
+            color: var(--cf-text-dim);
+        }
+
+        .code-block .tag { color: var(--cf-blue); }
+        .code-block .attr { color: var(--cf-orange); }
+        .code-block .val { color: var(--cf-green); }
+        .code-block .comment { color: var(--cf-text-faint); }
+
+        /* Callout boxes */
+        .callout {
+            border-radius: 8px;
+            padding: 1rem 1.2rem;
+            margin-bottom: 1rem;
+            font-size: 0.88rem;
+            display: flex;
+            gap: 0.7rem;
+            align-items: flex-start;
+        }
+
+        .callout-icon { font-size: 1rem; flex-shrink: 0; margin-top: 0.1rem; }
+        .callout p { margin-bottom: 0; color: inherit; }
+
+        .callout-tip {
+            background: rgba(34, 197, 94, 0.08);
+            border: 1px solid rgba(34, 197, 94, 0.2);
+            color: #86efac;
+        }
+
+        .callout-info {
+            background: var(--cf-blue-dim);
+            border: 1px solid rgba(14, 165, 233, 0.2);
+            color: #7dd3fc;
+        }
+
+        .callout-warn {
+            background: rgba(245, 158, 11, 0.08);
+            border: 1px solid rgba(245, 158, 11, 0.2);
+            color: #fcd34d;
+        }
+
+        /* Config table */
+        .config-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 1rem;
+            font-size: 0.85rem;
+        }
+
+        .config-table th {
+            text-align: left;
+            font-weight: 600;
+            font-size: 0.72rem;
+            text-transform: uppercase;
+            letter-spacing: 0.06em;
+            color: var(--cf-text-faint);
+            padding: 0.6rem 0.8rem;
+            border-bottom: 1px solid var(--cf-border);
+        }
+
+        .config-table td {
+            padding: 0.6rem 0.8rem;
+            border-bottom: 1px solid var(--cf-border);
+            color: var(--cf-text-dim);
+            vertical-align: top;
+        }
+
+        .config-table code {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.78rem;
+            color: var(--cf-blue);
+            background: var(--cf-blue-dim);
+            padding: 0.15rem 0.4rem;
+            border-radius: 3px;
+        }
+
+        /* Layout cards */
+        .layout-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 0.8rem;
+            margin-bottom: 1rem;
+        }
+
+        .layout-card {
+            background: var(--cf-surface);
+            border: 1px solid var(--cf-border);
+            border-radius: 8px;
+            padding: 1rem;
+        }
+
+        .layout-card h4 {
+            font-size: 0.85rem;
+            font-weight: 600;
+            margin-bottom: 0.3rem;
+        }
+
+        .layout-card p {
+            font-size: 0.8rem;
+            color: var(--cf-text-faint);
+            margin-bottom: 0;
+        }
+
+        /* Pricing mini-table */
+        .pricing-list {
+            list-style: none;
+            padding: 0;
+        }
+
+        .pricing-list li {
+            display: flex;
+            justify-content: space-between;
+            padding: 0.6rem 0;
+            border-bottom: 1px solid var(--cf-border);
+            font-size: 0.9rem;
+        }
+
+        .pricing-list li:last-child { border-bottom: none; }
+        .pricing-list .plan-name { font-weight: 500; color: var(--cf-text); }
+        .pricing-list .plan-price { color: var(--cf-blue); font-weight: 600; }
+
+        /* Divider */
+        .divider {
+            height: 1px;
+            background: linear-gradient(90deg, transparent, var(--cf-border), transparent);
+            margin: 2rem 0;
+        }
+
+        /* Footer */
+        .footer {
+            text-align: center;
+            padding: 2rem;
+            font-size: 0.75rem;
+            color: var(--cf-text-faint);
+        }
+
+        .footer a {
+            color: var(--cf-text-dim);
+            text-decoration: none;
+            transition: color 0.2s;
+        }
+
+        .footer a:hover { color: var(--cf-blue); }
+
+        /* Screenshot placeholder */
+        .screenshot {
+            background: var(--cf-surface);
+            border: 1px solid var(--cf-border);
+            border-radius: 8px;
+            padding: 2rem;
+            text-align: center;
+            color: var(--cf-text-faint);
+            font-size: 0.85rem;
+            margin-bottom: 1rem;
+        }
+
+        @media (max-width: 600px) {
+            .hero h1 { font-size: 1.7rem; }
+            .layout-grid { grid-template-columns: 1fr; }
+            .nav { padding: 0.75rem 1rem; }
+            .content { padding: 0 1.2rem 3rem; }
+        }
+    </style>
+</head>
+<body>
+
+<nav class="nav">
+    <a href="#" class="nav-logo">Cross<span>Feed</span> Guide</a>
+    <a href="/" class="nav-back">&larr; Back to Projects</a>
+</nav>
+
+<section class="hero">
+    <div class="hero-badge">User Guide</div>
+    <h1>Getting Started with CrossFeed</h1>
+    <p>Display your social media content on any website in minutes. This guide walks you through every step.</p>
+</section>
+
+<main class="content">
+
+    <nav class="toc">
+        <div class="toc-title">In this guide</div>
+        <ol>
+            <li><a href="#sign-in">Sign in to your account</a></li>
+            <li><a href="#dashboard">Explore your dashboard</a></li>
+            <li><a href="#embed-builder">Use the embed builder</a></li>
+            <li><a href="#add-to-site">Add the embed to your website</a></li>
+            <li><a href="#layouts">Choose a layout</a></li>
+            <li><a href="#config">Configure with data attributes</a></li>
+            <li><a href="#api">Use the REST API directly</a></li>
+            <li><a href="#plans">Plans and pricing</a></li>
+            <li><a href="#troubleshooting">Troubleshooting</a></li>
+        </ol>
+    </nav>
+
+    <!-- Step 1 -->
+    <section class="step" id="sign-in">
+        <div class="step-header">
+            <span class="step-number">1</span>
+            <h2>Sign in to your account</h2>
+        </div>
+        <p>Open your CrossFeed dashboard and sign in with your email and password.</p>
+        <ol>
+            <li>Navigate to the <strong>Dashboard</strong> from the CrossFeed landing page (click "Get Started Free" or "Dashboard" in the nav).</li>
+            <li>Enter your <strong>email</strong> and <strong>password</strong>.</li>
+            <li>Click <strong>Sign In</strong>.</li>
+        </ol>
+        <div class="callout callout-tip">
+            <span class="callout-icon">&#9889;</span>
+            <p><strong>Demo mode:</strong> The login form comes pre-filled with demo credentials (<code>demo@crossfeed.app</code> / <code>crossfeed</code>). Just click Sign In to explore.</p>
+        </div>
+        <p>Once authenticated, you'll be redirected to the main dashboard. Sessions last 30 days, so you won't need to log in often.</p>
+    </section>
+
+    <!-- Step 2 -->
+    <section class="step" id="dashboard">
+        <div class="step-header">
+            <span class="step-number">2</span>
+            <h2>Explore your dashboard</h2>
+        </div>
+        <p>The dashboard shows all your connected social media feeds at a glance.</p>
+        <p>Each <strong>feed card</strong> displays:</p>
+        <ul>
+            <li><strong>Platform icon and handle</strong> &mdash; e.g. the Instagram camera icon and <code>@yourhandle</code></li>
+            <li><strong>Post count</strong> &mdash; how many posts have been synced</li>
+            <li><strong>Last synced</strong> &mdash; when content was last pulled from the platform</li>
+            <li><strong>Status badge</strong> &mdash; <span style="color: var(--cf-green);">green</span> = active, <span style="color: var(--cf-orange);">orange</span> = paused, <span style="color: var(--cf-red);">red</span> = error</li>
+        </ul>
+        <p>Each card has two action buttons:</p>
+        <ul>
+            <li><strong>Get Embed Code</strong> &mdash; opens the visual embed builder for that feed</li>
+            <li><strong>View API</strong> &mdash; opens the raw JSON feed in a new tab, useful for developers</li>
+        </ul>
+        <div class="callout callout-info">
+            <span class="callout-icon">&#8505;</span>
+            <p>The <strong>Connect Feed</strong> button is coming soon. For now, demo feeds are pre-configured for you to explore the full workflow.</p>
+        </div>
+    </section>
+
+    <!-- Step 3 -->
+    <section class="step" id="embed-builder">
+        <div class="step-header">
+            <span class="step-number">3</span>
+            <h2>Use the embed builder</h2>
+        </div>
+        <p>The embed builder is a visual tool that lets you customize how your feed looks and generates the code snippet to paste on your site.</p>
+        <ol>
+            <li>From the dashboard, click <strong>Get Embed Code</strong> on any feed card.</li>
+            <li>On the left panel, pick a <strong>layout</strong> (Grid, Masonry, Carousel, or List).</li>
+            <li>Adjust the settings:
+                <ul>
+                    <li><strong>Columns</strong> &mdash; how many columns to display (1&ndash;6)</li>
+                    <li><strong>Number of Posts</strong> &mdash; how many posts to show (1&ndash;50)</li>
+                    <li><strong>Gap</strong> &mdash; spacing between items in pixels (0&ndash;32)</li>
+                    <li><strong>Link to original posts</strong> &mdash; make images clickable to the source</li>
+                    <li><strong>Lazy load images</strong> &mdash; defer offscreen images for performance</li>
+                </ul>
+            </li>
+            <li>Watch the <strong>live preview</strong> update in real-time on the right panel as you tweak settings.</li>
+            <li>When you're happy, click the <strong>Copy</strong> button above the code snippet.</li>
+        </ol>
+        <div class="callout callout-tip">
+            <span class="callout-icon">&#9889;</span>
+            <p>The preview is a live render of the actual embed script &mdash; what you see is exactly what your visitors will see.</p>
+        </div>
+    </section>
+
+    <!-- Step 4 -->
+    <section class="step" id="add-to-site">
+        <div class="step-header">
+            <span class="step-number">4</span>
+            <h2>Add the embed to your website</h2>
+        </div>
+        <p>Paste the copied code snippet into your website's HTML wherever you want the feed to appear.</p>
+
+        <div class="code-block"><code><span class="comment">&lt;!-- 1. Add a container where the feed will render --&gt;</span>
+<span class="tag">&lt;div</span> <span class="attr">id</span>=<span class="val">"crossfeed-widget"</span><span class="tag">&gt;&lt;/div&gt;</span>
+
+<span class="comment">&lt;!-- 2. Include the embed script --&gt;</span>
+<span class="tag">&lt;script</span> <span class="attr">src</span>=<span class="val">"https://crossfeed.app/embed.js"</span>
+  <span class="attr">data-feed</span>=<span class="val">"your_feed_id"</span>
+  <span class="attr">data-target</span>=<span class="val">"#crossfeed-widget"</span>
+  <span class="attr">data-layout</span>=<span class="val">"grid"</span>
+  <span class="attr">data-columns</span>=<span class="val">"3"</span>
+  <span class="attr">data-limit</span>=<span class="val">"9"</span>
+  <span class="attr">data-gap</span>=<span class="val">"8"</span>
+  <span class="attr">data-link</span>=<span class="val">"true"</span>
+  <span class="attr">data-lazy</span>=<span class="val">"true"</span><span class="tag">&gt;</span>
+<span class="tag">&lt;/script&gt;</span></code></div>
+
+        <p>That's it. The script handles everything automatically:</p>
+        <ol>
+            <li>Shows a <strong>skeleton loader</strong> with shimmer animation while fetching</li>
+            <li>Fetches your latest posts from the CrossFeed API</li>
+            <li>Renders the feed in your chosen layout</li>
+            <li>Uses <strong>Shadow DOM</strong> so CrossFeed styles never conflict with your site's CSS</li>
+        </ol>
+
+        <div class="callout callout-info">
+            <span class="callout-icon">&#8505;</span>
+            <p>The embed script is under 8 KB gzipped. It loads asynchronously and won't block your page.</p>
+        </div>
+    </section>
+
+    <!-- Step 5 -->
+    <section class="step" id="layouts">
+        <div class="step-header">
+            <span class="step-number">5</span>
+            <h2>Choose a layout</h2>
+        </div>
+        <p>CrossFeed ships with four built-in layouts. Set the <code>data-layout</code> attribute to switch between them.</p>
+
+        <div class="layout-grid">
+            <div class="layout-card">
+                <h4>Grid</h4>
+                <p>Fixed columns, square images. Clean and uniform &mdash; great for Instagram-style feeds.</p>
+            </div>
+            <div class="layout-card">
+                <h4>Masonry</h4>
+                <p>Pinterest-style columns with variable image heights. Best for mixed content and photography.</p>
+            </div>
+            <div class="layout-card">
+                <h4>Carousel</h4>
+                <p>Horizontal scroll with snap points and prev/next buttons. Ideal for featured content or limited space.</p>
+            </div>
+            <div class="layout-card">
+                <h4>List</h4>
+                <p>Vertical list with thumbnails, captions, and dates. Perfect for blogs or news-style feeds.</p>
+            </div>
+        </div>
+
+        <p>All layouts are <strong>responsive</strong> out of the box &mdash; they automatically adapt to 2 columns on mobile screens (under 640px).</p>
+    </section>
+
+    <!-- Step 6 -->
+    <section class="step" id="config">
+        <div class="step-header">
+            <span class="step-number">6</span>
+            <h2>Configure with data attributes</h2>
+        </div>
+        <p>Every aspect of the embed is controlled through <code>data-*</code> attributes on the script tag. No JavaScript configuration needed.</p>
+
+        <table class="config-table">
+            <thead>
+                <tr>
+                    <th>Attribute</th>
+                    <th>Default</th>
+                    <th>Description</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td><code>data-feed</code></td>
+                    <td>&mdash;</td>
+                    <td><strong>Required.</strong> Your feed ID (e.g. <code>your_feed_id</code>)</td>
+                </tr>
+                <tr>
+                    <td><code>data-target</code></td>
+                    <td>auto</td>
+                    <td>CSS selector for the container element. If omitted, a div is created automatically.</td>
+                </tr>
+                <tr>
+                    <td><code>data-layout</code></td>
+                    <td><code>grid</code></td>
+                    <td>One of: <code>grid</code>, <code>masonry</code>, <code>carousel</code>, <code>list</code></td>
+                </tr>
+                <tr>
+                    <td><code>data-columns</code></td>
+                    <td><code>3</code></td>
+                    <td>Number of columns (1&ndash;6)</td>
+                </tr>
+                <tr>
+                    <td><code>data-limit</code></td>
+                    <td><code>9</code></td>
+                    <td>Number of posts to display (1&ndash;50)</td>
+                </tr>
+                <tr>
+                    <td><code>data-gap</code></td>
+                    <td><code>8</code></td>
+                    <td>Space between items in pixels (0&ndash;32)</td>
+                </tr>
+                <tr>
+                    <td><code>data-link</code></td>
+                    <td><code>true</code></td>
+                    <td>Wrap images in links to the original post</td>
+                </tr>
+                <tr>
+                    <td><code>data-lazy</code></td>
+                    <td><code>true</code></td>
+                    <td>Lazy load offscreen images for performance</td>
+                </tr>
+            </tbody>
+        </table>
+    </section>
+
+    <!-- Step 7 -->
+    <section class="step" id="api">
+        <div class="step-header">
+            <span class="step-number">7</span>
+            <h2>Use the REST API directly</h2>
+        </div>
+        <p>If you prefer to build your own UI or integrate with a framework, you can fetch feed data directly from the API.</p>
+
+        <h3 style="font-size: 1rem; margin-bottom: 0.8rem;">Get feed posts</h3>
+        <div class="code-block"><code><span class="comment"># Fetch the latest 9 posts</span>
+GET /v1/feed/{feed_id}?limit=9
+
+<span class="comment"># With API key authentication</span>
+curl https://crossfeed.app/v1/feed/your_feed_id?limit=9 \
+  -H <span class="val">"X-CrossFeed-Key: cf_your_api_key"</span></code></div>
+
+        <h3 style="font-size: 1rem; margin-bottom: 0.8rem;">Response</h3>
+        <div class="code-block"><code>{
+  <span class="attr">"feed"</span>: {
+    <span class="attr">"id"</span>: <span class="val">"your_feed_id"</span>,
+    <span class="attr">"platform"</span>: <span class="val">"instagram"</span>,
+    <span class="attr">"handle"</span>: <span class="val">"@yourhandle"</span>
+  },
+  <span class="attr">"posts"</span>: [
+    {
+      <span class="attr">"id"</span>: <span class="val">"post_001"</span>,
+      <span class="attr">"image_url"</span>: <span class="val">"/media/your_feed_id/post_001"</span>,
+      <span class="attr">"caption"</span>: <span class="val">"Sunday brunch vibes"</span>,
+      <span class="attr">"source_url"</span>: <span class="val">"https://instagram.com/p/..."</span>,
+      <span class="attr">"posted_at"</span>: <span class="val">"2025-01-15T10:30:00Z"</span>
+    }
+  ]
+}</code></div>
+
+        <h3 style="font-size: 1rem; margin-bottom: 0.8rem;">Get feed metadata</h3>
+        <div class="code-block"><code>GET /v1/feed/{feed_id}/meta</code></div>
+        <p>Returns feed name, platform, avatar URL, total post count, and last sync timestamp.</p>
+
+        <div class="callout callout-warn">
+            <span class="callout-icon">&#9888;</span>
+            <p><strong>Rate limits apply</strong> based on your plan. Free tier allows 1,000 API calls per day. Check the <a href="#plans" style="color: inherit; text-decoration: underline;">plans section</a> for details.</p>
+        </div>
+    </section>
+
+    <!-- Step 8 -->
+    <section class="step" id="plans">
+        <div class="step-header">
+            <span class="step-number">8</span>
+            <h2>Plans and pricing</h2>
+        </div>
+        <p>CrossFeed offers five tiers to match your needs. All plans include the embed script and REST API access.</p>
+
+        <ul class="pricing-list">
+            <li>
+                <span class="plan-name">Free</span>
+                <span class="plan-price">$0/mo</span>
+            </li>
+            <li>
+                <span class="plan-name">Creator</span>
+                <span class="plan-price">$5/mo</span>
+            </li>
+            <li>
+                <span class="plan-name">Pro <span style="color: var(--cf-blue); font-size: 0.7rem;">POPULAR</span></span>
+                <span class="plan-price">$12/mo</span>
+            </li>
+            <li>
+                <span class="plan-name">Agency</span>
+                <span class="plan-price">$49/mo</span>
+            </li>
+            <li>
+                <span class="plan-name">Scale</span>
+                <span class="plan-price">$99/mo</span>
+            </li>
+        </ul>
+
+        <table class="config-table" style="margin-top: 1rem;">
+            <thead>
+                <tr>
+                    <th>Feature</th>
+                    <th>Free</th>
+                    <th>Creator</th>
+                    <th>Pro</th>
+                    <th>Agency</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>Feeds</td>
+                    <td>1</td>
+                    <td>3</td>
+                    <td>10</td>
+                    <td>50</td>
+                </tr>
+                <tr>
+                    <td>API calls/day</td>
+                    <td>1K</td>
+                    <td>10K</td>
+                    <td>50K</td>
+                    <td>200K</td>
+                </tr>
+                <tr>
+                    <td>Sync interval</td>
+                    <td>24h</td>
+                    <td>6h</td>
+                    <td>1h</td>
+                    <td>15 min</td>
+                </tr>
+                <tr>
+                    <td>Layouts</td>
+                    <td>Grid</td>
+                    <td>All 4</td>
+                    <td>All 4</td>
+                    <td>All 4</td>
+                </tr>
+                <tr>
+                    <td>Watermark</td>
+                    <td>Yes</td>
+                    <td>No</td>
+                    <td>No</td>
+                    <td>No</td>
+                </tr>
+            </tbody>
+        </table>
+
+        <p style="margin-top: 0.8rem;">The <strong>Scale</strong> plan ($99/mo) adds unlimited feeds, 1M API calls/day, 5-minute sync, and white-label branding.</p>
+    </section>
+
+    <!-- Step 9 -->
+    <section class="step" id="troubleshooting">
+        <div class="step-header">
+            <span class="step-number">9</span>
+            <h2>Troubleshooting</h2>
+        </div>
+
+        <p><strong>"No posts found" message</strong></p>
+        <ul>
+            <li>Double-check the <code>data-feed</code> value matches your feed ID exactly.</li>
+            <li>Make sure the feed has been synced at least once (check the dashboard for "Last Synced" timestamp).</li>
+        </ul>
+
+        <p><strong>"Failed to load feed" error</strong></p>
+        <ul>
+            <li>Verify the embed script <code>src</code> URL is correct and accessible.</li>
+            <li>Check the browser console for <code>[CrossFeed]</code> error messages with details.</li>
+            <li>If using domain restriction (Pro+), ensure your site's domain is in your allowed list.</li>
+        </ul>
+
+        <p><strong>Styles look broken on my site</strong></p>
+        <ul>
+            <li>CrossFeed uses Shadow DOM for style isolation &mdash; your site's CSS should not affect it. If it does, ensure the container element (<code>data-target</code>) isn't being styled with <code>all: initial</code> or similar resets.</li>
+        </ul>
+
+        <p><strong>Images load slowly</strong></p>
+        <ul>
+            <li>Make sure <code>data-lazy="true"</code> is set (default). This defers offscreen images.</li>
+            <li>Reduce the number of posts with <code>data-limit</code> if you're loading many at once.</li>
+        </ul>
+
+        <p><strong>Carousel buttons don't scroll</strong></p>
+        <ul>
+            <li>The carousel requires enough posts to overflow the container. Try increasing <code>data-limit</code> or narrowing the container width.</li>
+        </ul>
+
+        <div class="callout callout-info">
+            <span class="callout-icon">&#8505;</span>
+            <p>Need help? Open the browser console and look for messages prefixed with <code>[CrossFeed]</code> &mdash; they'll point you to the issue.</p>
+        </div>
+    </section>
+
+    <div class="divider"></div>
+
+    <footer class="footer">
+        <p>CrossFeed &mdash; Your content, everywhere.</p>
+        <p style="margin-top: 0.4rem;"><a href="/">Back to Projects</a></p>
+    </footer>
+
+</main>
+
+</body>
+</html>

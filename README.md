@@ -75,6 +75,8 @@ cd flipper && npx serve .
 
 Hosted on Cloudflare Pages:
 
+> ⚠️ `deploy .` uploads the whole dir; Pages ignores `.gitignore`/`.assetsignore`. Confirm no `.env`/keys/secrets live here before deploying. Keep static-only.
+
 ```bash
 npx wrangler pages deploy .
 ```
