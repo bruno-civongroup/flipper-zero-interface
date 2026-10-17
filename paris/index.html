@@ -1,0 +1,1094 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="description" content="Work out what a Paris apartment really costs to buy, hold and sell — notary duties, copropriété charges, local taxes, IFI, and every line that changes for non-residents and American expats.">
+<link rel="canonical" href="https://projects.brunomalnovic.com/paris/">
+<meta property="og:title" content="Paris Property Décompte">
+<meta property="og:description" content="Work out what a Paris apartment really costs to buy, hold and sell — notary duties, copropriété charges, local taxes, IFI, and every line that changes for non-residents and American expats.">
+<meta property="og:url" content="https://projects.brunomalnovic.com/paris/">
+<meta property="og:type" content="website">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<title>Paris Property Décompte</title>
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Spectral:ital,wght@0,400;0,600;0,700;1,400&family=Archivo:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap">
+<style>
+:root{
+  color-scheme: light;
+  --ground:#EAECE6; --surface:#FAFBF7; --surface-2:#F2F4EE; --surface-3:#E3E7DF;
+  --ink:#151C18; --ink-2:#4A544E; --ink-3:#7B857E;
+  --rule:#D3D8CE; --rule-strong:#B6BDB2;
+  --accent:#0E5C3F; --accent-ink:#0E5C3F; --accent-soft:#E0E9E2;
+  --plaque-field:#123A5C; --plaque-ribbon:#0E5C3F; --plaque-ink:#F7F9F4;
+  --plaque-eyebrow:#9FC4A9; --plaque-sub:#B9D3C0;
+  --good:#15704B; --warn:#8A5A12; --crit:#9B2B1F;
+  --good-bg:#E2EDE6; --warn-bg:#F6EEDC; --crit-bg:#F6E4E0;
+  --usa:#1C4A8B; --usa-bg:#E4EAF3;
+
+  --s1:#2a78d6; --s2:#eb6834; --s3:#1baf7a; --s4:#eda100;
+  --s5:#e87ba4; --s6:#008300; --s7:#4a3aa7; --s8:#e34948;
+  --on1:#ffffff; --on2:#1a1a19; --on3:#1a1a19; --on4:#1a1a19;
+  --on5:#1a1a19; --on6:#ffffff; --on7:#ffffff; --on8:#ffffff;
+
+  --ramp1:#cde2fb; --ramp2:#b7d3f6; --ramp3:#9ec5f4; --ramp4:#86b6ef;
+  --ramp5:#5598e7; --ramp6:#2a78d6; --ramp7:#1c5cab; --ramp8:#104281;
+  --ramp-ink-lo:#0d2b4d; --ramp-ink-hi:#ffffff;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    color-scheme: dark;
+    --ground:#0E1310; --surface:#1A211C; --surface-2:#141A16; --surface-3:#222B24;
+    --ink:#E7EBE4; --ink-2:#A3AEA5; --ink-3:#78827A;
+    --rule:#2A332C; --rule-strong:#3A463C;
+    --accent:#5FC093; --accent-ink:#7FD2A8; --accent-soft:#1C2A22;
+    --plaque-field:#0F2E49; --plaque-ribbon:#1E7A54; --plaque-ink:#F1F5EE;
+    --plaque-eyebrow:#7FB492; --plaque-sub:#A6C4AF;
+    --good:#4FBE8C; --warn:#D9A24A; --crit:#E8766A;
+    --good-bg:#172A20; --warn-bg:#2C2415; --crit-bg:#2E1C18;
+    --usa:#7FA8D4; --usa-bg:#16212F;
+
+    --s1:#3987e5; --s2:#d95926; --s3:#199e70; --s4:#c98500;
+    --s5:#d55181; --s6:#008300; --s7:#9085e9; --s8:#e66767;
+    --on1:#ffffff; --on2:#ffffff; --on3:#ffffff; --on4:#1a1a19;
+    --on5:#ffffff; --on6:#ffffff; --on7:#1a1a19; --on8:#1a1a19;
+
+    --ramp1:#104281; --ramp2:#1c5cab; --ramp3:#256abf; --ramp4:#2a78d6;
+    --ramp5:#3987e5; --ramp6:#5598e7; --ramp7:#86b6ef; --ramp8:#b7d3f6;
+    --ramp-ink-lo:#e8f1fb; --ramp-ink-hi:#0d2b4d;
+  }
+}
+:root[data-theme="dark"]{
+  color-scheme: dark;
+  --ground:#0E1310; --surface:#1A211C; --surface-2:#141A16; --surface-3:#222B24;
+  --ink:#E7EBE4; --ink-2:#A3AEA5; --ink-3:#78827A;
+  --rule:#2A332C; --rule-strong:#3A463C;
+  --accent:#5FC093; --accent-ink:#7FD2A8; --accent-soft:#1C2A22;
+  --plaque-field:#0F2E49; --plaque-ribbon:#1E7A54; --plaque-ink:#F1F5EE;
+  --plaque-eyebrow:#7FB492; --plaque-sub:#A6C4AF;
+  --good:#4FBE8C; --warn:#D9A24A; --crit:#E8766A;
+  --good-bg:#172A20; --warn-bg:#2C2415; --crit-bg:#2E1C18;
+  --usa:#7FA8D4; --usa-bg:#16212F;
+
+  --s1:#3987e5; --s2:#d95926; --s3:#199e70; --s4:#c98500;
+  --s5:#d55181; --s6:#008300; --s7:#9085e9; --s8:#e66767;
+  --on1:#ffffff; --on2:#ffffff; --on3:#ffffff; --on4:#1a1a19;
+  --on5:#ffffff; --on6:#ffffff; --on7:#1a1a19; --on8:#1a1a19;
+
+  --ramp1:#104281; --ramp2:#1c5cab; --ramp3:#256abf; --ramp4:#2a78d6;
+  --ramp5:#3987e5; --ramp6:#5598e7; --ramp7:#86b6ef; --ramp8:#b7d3f6;
+  --ramp-ink-lo:#e8f1fb; --ramp-ink-hi:#0d2b4d;
+}
+
+*{box-sizing:border-box}
+body{
+  margin:0; background:var(--ground); color:var(--ink);
+  font-family:Archivo,"Helvetica Neue",Arial,sans-serif;
+  font-size:15px; line-height:1.5; -webkit-font-smoothing:antialiased;
+}
+.wrap{max-width:1300px; margin:0 auto; padding:28px 22px 80px}
+.num{font-family:"IBM Plex Mono",ui-monospace,Menlo,monospace; font-variant-numeric:tabular-nums}
+
+/* ---------- masthead: enamel Paris street plaque ---------- */
+.masthead{display:flex; flex-wrap:wrap; gap:20px; align-items:flex-end; justify-content:space-between; margin-bottom:24px}
+.plaque{
+  background:var(--plaque-field); color:var(--plaque-ink);
+  padding:9px; border-radius:3px; flex:1 1 440px; max-width:560px;
+  box-shadow:0 1px 0 var(--rule-strong), 0 10px 26px -18px rgba(0,0,0,.55);
+}
+.plaque-in{border:2px solid var(--plaque-ribbon); border-radius:2px; padding:14px 20px 16px}
+.plaque .eyebrow{font-size:10px; letter-spacing:.2em; text-transform:uppercase; color:var(--plaque-eyebrow); font-weight:600; margin-bottom:5px}
+.plaque h1{font-family:Spectral,Georgia,serif; font-weight:700; font-size:clamp(26px,4.2vw,38px); line-height:1.04; margin:0; letter-spacing:-.012em; text-wrap:balance}
+.plaque .sub{font-size:12.5px; color:var(--plaque-sub); margin-top:7px; line-height:1.45}
+.stamp{font-size:11.5px; color:var(--ink-2); text-align:right; max-width:310px; line-height:1.45}
+.stamp b{display:block; font-size:10px; letter-spacing:.16em; text-transform:uppercase; color:var(--ink-3); font-weight:600}
+.themebtn{margin-top:9px; background:transparent; border:1px solid var(--rule-strong); color:var(--ink-2); font:inherit; font-size:11.5px; padding:4px 11px; border-radius:999px; cursor:pointer}
+.themebtn:hover{border-color:var(--accent); color:var(--accent-ink)}
+
+/* ---------- KPI strip ---------- */
+.kpis{display:grid; grid-template-columns:repeat(auto-fit,minmax(212px,1fr)); gap:1px; background:var(--rule); border:1px solid var(--rule); border-radius:4px; overflow:hidden; margin-bottom:24px}
+.kpi{background:var(--surface); padding:16px 18px 17px; display:flex; flex-direction:column; gap:3px}
+.kpi.lead{background:var(--accent-soft)}
+.kpi .k{font-size:10px; letter-spacing:.15em; text-transform:uppercase; color:var(--ink-3); font-weight:600}
+.kpi.lead .k{color:var(--accent-ink)}
+.kpi .v{font-family:"IBM Plex Mono",monospace; font-variant-numeric:tabular-nums; font-size:clamp(20px,2.4vw,26px); font-weight:500; letter-spacing:-.02em; line-height:1.15}
+.kpi .n{font-size:11.5px; color:var(--ink-2); line-height:1.35}
+
+/* ---------- main grid ---------- */
+.main{display:grid; grid-template-columns:minmax(0,1.42fr) minmax(0,1fr); gap:20px; align-items:start}
+@media (max-width:1020px){ .main{grid-template-columns:1fr} }
+.dossier{display:flex; flex-direction:column; gap:14px}
+section.card{background:var(--surface); border:1px solid var(--rule); border-radius:4px; padding:18px 20px 20px}
+section.card.usa{border-color:var(--usa); background:var(--usa-bg)}
+section.card[hidden]{display:none!important}
+.sechead{display:flex; gap:11px; align-items:baseline; margin-bottom:15px; padding-bottom:11px; border-bottom:1px solid var(--rule)}
+.roman{font-family:Spectral,Georgia,serif; font-size:13px; font-weight:600; color:var(--accent-ink); letter-spacing:.04em; min-width:28px}
+.usa .roman{color:var(--usa)}
+.sechead h2{font-family:Spectral,Georgia,serif; font-size:19px; font-weight:600; margin:0; letter-spacing:-.01em; flex:1 1 auto; min-width:0; text-wrap:balance}
+.sechead .note{font-size:11px; color:var(--ink-3); text-align:right; max-width:200px; line-height:1.35; flex:0 1 auto}
+
+.grid2{display:grid; grid-template-columns:1fr 1fr; gap:12px 14px}
+.grid3{display:grid; grid-template-columns:repeat(3,1fr); gap:12px 14px}
+@media (max-width:640px){ .grid2,.grid3{grid-template-columns:1fr} }
+.field{display:flex; flex-direction:column; gap:4px; min-width:0}
+.field>label{font-size:11px; letter-spacing:.07em; text-transform:uppercase; color:var(--ink-2); font-weight:600}
+.field .hint{font-size:11px; color:var(--ink-3); line-height:1.35}
+input[type=number],input[type=text],select{
+  font-family:"IBM Plex Mono",monospace; font-variant-numeric:tabular-nums; font-size:14px;
+  padding:7px 9px; width:100%; min-width:0;
+  background:var(--surface-2); color:var(--ink); border:1px solid var(--rule-strong); border-radius:3px;
+}
+.usa input,.usa select{background:var(--surface)}
+select{font-family:Archivo,sans-serif; font-variant-numeric:normal}
+input:focus-visible,select:focus-visible,button:focus-visible{outline:2px solid var(--accent); outline-offset:1px}
+.unit{position:relative}
+.unit input{padding-right:40px}
+.unit span{position:absolute; right:9px; top:50%; transform:translateY(-50%); font-size:12px; color:var(--ink-3); font-family:"IBM Plex Mono",monospace; pointer-events:none}
+.checks{display:flex; flex-wrap:wrap; gap:7px; margin-top:12px}
+.chk{display:inline-flex; align-items:center; gap:6px; font-size:12.5px; padding:5px 11px 5px 8px; border:1px solid var(--rule-strong); border-radius:999px; cursor:pointer; background:var(--surface-2); user-select:none}
+.usa .chk{background:var(--surface)}
+.chk input{accent-color:var(--accent); margin:0}
+.chk:has(input:checked){border-color:var(--accent); background:var(--accent-soft); color:var(--accent-ink); font-weight:500}
+.usa .chk:has(input:checked){border-color:var(--usa); color:var(--usa)}
+
+/* arrondissement snail grid — sequential €/m² heatmap, doubles as selector */
+.snail{display:grid; grid-template-columns:repeat(5,1fr); gap:4px; max-width:340px}
+.arr{
+  grid-column:var(--c); grid-row:var(--r); aspect-ratio:1;
+  border:1px solid transparent; border-radius:2px; cursor:pointer; padding:2px;
+  display:flex; flex-direction:column; align-items:center; justify-content:center; gap:1px;
+  font-family:"IBM Plex Mono",monospace; font-size:12px; font-weight:600; line-height:1;
+}
+.arr small{font-size:8.5px; font-weight:400; opacity:.88; letter-spacing:-.03em}
+.arr[aria-pressed=true]{outline:2px solid var(--ink); outline-offset:1px}
+.arr:focus-visible{outline:2px solid var(--ink); outline-offset:1px}
+.snail-legend{display:flex; align-items:center; gap:7px; margin-top:9px; font-size:11px; color:var(--ink-3); flex-wrap:wrap}
+.snail-legend .bar{display:flex; height:9px; width:112px; border-radius:2px; overflow:hidden}
+.snail-legend .bar i{flex:1}
+
+/* ---------- décompte (sticky statement) ---------- */
+.decompte{position:sticky; top:16px; background:var(--surface); border:1px solid var(--rule-strong); border-radius:4px; overflow:hidden}
+.dc-head{background:var(--surface-3); padding:13px 18px; border-bottom:1px solid var(--rule-strong)}
+.dc-head .t{font-family:Spectral,Georgia,serif; font-size:17px; font-weight:600; letter-spacing:-.01em}
+.dc-head .s{font-size:11px; color:var(--ink-2); margin-top:1px; line-height:1.4}
+.dc-body{padding:6px 18px 18px; max-height:calc(100vh - 110px); overflow-y:auto}
+.dc-group{margin-top:14px}
+.dc-group>h3{font-size:10px; letter-spacing:.16em; text-transform:uppercase; color:var(--ink-3); font-weight:600; margin:0 0 7px; padding-bottom:5px; border-bottom:1px solid var(--rule)}
+.li{display:flex; align-items:baseline; gap:8px; padding:3.5px 0; font-size:13px}
+.li .lab{color:var(--ink-2); flex:0 1 auto}
+.li .dots{flex:1 1 auto; border-bottom:1px dotted var(--rule-strong); min-width:12px; transform:translateY(-3px)}
+.li .val{font-family:"IBM Plex Mono",monospace; font-variant-numeric:tabular-nums; white-space:nowrap; font-weight:500}
+.li.zero .lab,.li.zero .val{color:var(--ink-3); font-weight:400}
+.li.cr .val{color:var(--good)}
+.li.sum{margin-top:6px; padding-top:8px; border-top:1.5px solid var(--ink); font-size:14.5px; justify-content:space-between}
+.li.sum .lab{color:var(--ink); font-weight:600; font-family:Spectral,Georgia,serif; font-size:15px}
+.li.sum .val{font-weight:600}
+.li.sum .dots{display:none}
+
+/* ---------- charts ---------- */
+.band{margin-top:24px; display:grid; grid-template-columns:minmax(0,1.42fr) minmax(0,1fr); gap:20px; align-items:start}
+@media (max-width:1020px){ .band{grid-template-columns:1fr} }
+.charthead{margin-bottom:13px}
+.charthead h2{font-family:Spectral,Georgia,serif; font-size:19px; font-weight:600; margin:0 0 3px; letter-spacing:-.01em}
+.charthead p{margin:0; font-size:12px; color:var(--ink-2); max-width:64ch; line-height:1.45}
+.stack{display:flex; gap:2px; height:38px; margin:6px 0 12px}
+.seg{display:flex; align-items:center; justify-content:center; min-width:3px; border-radius:1px; overflow:hidden}
+.seg:first-child{border-radius:3px 1px 1px 3px}
+.seg:last-child{border-radius:1px 3px 3px 1px}
+.seg b{font-family:"IBM Plex Mono",monospace; font-size:10.5px; font-weight:600; letter-spacing:-.02em}
+.legend{display:grid; grid-template-columns:repeat(auto-fit,minmax(178px,1fr)); gap:0 16px}
+.lg{display:flex; align-items:baseline; gap:8px; font-size:12.5px; padding:3px 0; border-bottom:1px solid var(--rule)}
+.lg .sw{width:9px; height:9px; border-radius:2px; flex:none; transform:translateY(-1px)}
+.lg .nm{color:var(--ink-2); flex:1 1 auto; min-width:0}
+.lg .vv{font-family:"IBM Plex Mono",monospace; font-variant-numeric:tabular-nums; white-space:nowrap}
+.lg .pp{font-family:"IBM Plex Mono",monospace; color:var(--ink-3); font-size:11px; white-space:nowrap; min-width:40px; text-align:right}
+.lg.off{opacity:.45}
+.spark{display:flex; align-items:flex-end; gap:3px; height:104px; margin:4px 0 10px}
+.spark .col{flex:1; display:flex; flex-direction:column; justify-content:flex-end; gap:2px; min-width:0}
+.spark .col i{display:block}
+.spark .col i:first-child{border-radius:1px 1px 0 0}
+.spark .col u{text-decoration:none; font-family:"IBM Plex Mono",monospace; font-size:9px; color:var(--ink-3); text-align:center; margin-top:3px}
+.spark .col[data-hit=true]{position:relative}
+.spark .col[data-hit=true]::after{content:"IFI"; position:absolute; top:-2px; left:50%; transform:translateX(-50%); font-family:"IBM Plex Mono",monospace; font-size:8px; font-weight:600; color:var(--crit); letter-spacing:-.02em}
+
+/* ---------- ledgers ---------- */
+.ledgers{margin-top:24px; display:grid; grid-template-columns:1fr 1fr; gap:20px; align-items:start}
+@media (max-width:880px){ .ledgers{grid-template-columns:1fr} }
+.tscroll{overflow-x:auto}
+table{width:100%; border-collapse:collapse; font-size:12.5px; min-width:300px}
+caption{text-align:left; font-family:Spectral,Georgia,serif; font-size:17px; font-weight:600; margin-bottom:8px}
+th{text-align:left; font-size:9.5px; letter-spacing:.14em; text-transform:uppercase; color:var(--ink-3); font-weight:600; padding:0 0 6px; border-bottom:1px solid var(--rule-strong)}
+th.r,td.r{text-align:right}
+td{padding:5.5px 0; border-bottom:1px solid var(--rule); vertical-align:top}
+td.r{font-family:"IBM Plex Mono",monospace; font-variant-numeric:tabular-nums; white-space:nowrap; padding-left:10px}
+td .basis{display:block; font-size:10.5px; color:var(--ink-3); line-height:1.3}
+tr.tot td{border-bottom:none; border-top:1.5px solid var(--ink); padding-top:8px; font-weight:600}
+tr.tot td:first-child{font-family:Spectral,Georgia,serif; font-size:14px}
+tr.sub td{border-top:1px solid var(--rule-strong); font-weight:600}
+tr.nil td,tr.nil td .basis{color:var(--ink-3)}
+tr.cr td.r{color:var(--good)}
+.cap-note{font-size:11.5px; color:var(--ink-2); line-height:1.5; margin:10px 0 0}
+
+/* ---------- watch list ---------- */
+.watch{margin-top:26px}
+.wlist{display:grid; grid-template-columns:repeat(auto-fit,minmax(296px,1fr)); gap:10px; margin-top:13px}
+.w{display:flex; gap:11px; padding:12px 14px; border:1px solid var(--rule); border-radius:4px; background:var(--surface); border-left-width:3px}
+.w.crit{border-left-color:var(--crit); background:var(--crit-bg)}
+.w.warn{border-left-color:var(--warn); background:var(--warn-bg)}
+.w.info{border-left-color:var(--rule-strong)}
+.w.good{border-left-color:var(--good); background:var(--good-bg)}
+.w.us{border-left-color:var(--usa); background:var(--usa-bg)}
+.w .ic{font-family:"IBM Plex Mono",monospace; font-size:10px; font-weight:600; letter-spacing:.06em; flex:none; padding-top:2px; min-width:30px}
+.w.crit .ic{color:var(--crit)} .w.warn .ic{color:var(--warn)} .w.good .ic{color:var(--good)} .w.info .ic{color:var(--ink-3)} .w.us .ic{color:var(--usa)}
+.w .tx{font-size:12.5px; line-height:1.45}
+.w .tx b{display:block; font-size:13px; margin-bottom:2px; font-weight:600}
+
+/* ---------- notes ---------- */
+.notes{margin-top:30px; padding-top:22px; border-top:1px solid var(--rule-strong)}
+.notes h2{font-family:Spectral,Georgia,serif; font-size:19px; font-weight:600; margin:0 0 12px}
+.ncols{column-width:296px; column-gap:30px; font-size:12.5px; color:var(--ink-2); line-height:1.55}
+.ncols h3{font-family:Archivo,sans-serif; font-size:10.5px; letter-spacing:.14em; text-transform:uppercase; color:var(--ink); font-weight:600; margin:0 0 5px; break-after:avoid}
+.ncols p{margin:0 0 13px; break-inside:avoid}
+.ncols code{font-family:"IBM Plex Mono",monospace; font-size:11.5px; background:var(--surface-2); padding:1px 4px; border-radius:2px}
+.disc{margin-top:18px; padding:13px 16px; border:1px dashed var(--rule-strong); border-radius:4px; font-size:12px; color:var(--ink-2); line-height:1.55}
+.disc b{color:var(--ink)}
+
+/* Grid and flex children default to min-width:auto, which makes them refuse to
+   shrink below their content — that stops the overflow-x containers below from
+   ever engaging and pushes the page body sideways. */
+.main>*,.band>*,.ledgers>*,.dossier>*,.kpis>*,.wlist>*,.legend>*{min-width:0}
+
+@media (max-width:760px){
+  /* the section note sits beside the heading on desktop; below it on phones,
+     where sharing the row crushed the heading to a few characters */
+  .sechead{flex-wrap:wrap; gap:5px 11px}
+  .sechead .note{flex:1 0 100%; max-width:none; text-align:left}
+}
+@media (max-width:1020px){
+  /* single column here, so the statement should flow with the page rather than
+     pin itself and trap touch scrolling inside its own scroller */
+  .decompte{position:static}
+  .dc-body{max-height:none; overflow-y:visible}
+}
+
+@media (prefers-reduced-motion:reduce){ *{transition:none!important; animation:none!important} }
+@media print{
+  body{background:#fff}
+  .wrap{padding:0; max-width:none}
+  .themebtn,.snail,.snail-legend,.spark{display:none}
+  .decompte{position:static}
+  .dc-body{max-height:none; overflow:visible}
+  section.card,.kpi,.w{break-inside:avoid}
+}
+</style>
+</head>
+<body>
+
+
+<div class="wrap">
+
+  <header class="masthead">
+    <div class="plaque">
+      <div class="plaque-in">
+        <div class="eyebrow">Ville de Paris · Acquisition immobilière</div>
+        <h1>Paris Property Décompte</h1>
+        <div class="sub">What a Paris apartment really costs to buy, hold and sell — notary duties, copropriété charges, local taxes, IFI, and every line that changes for non-residents and American expats.</div>
+      </div>
+    </div>
+    <div class="stamp">
+      <b>Rates as of October 2026</b>
+      Paris DMTO 5,00 % départemental since 1 April 2025 · IFI threshold €1 300 000 · taxe foncière rate 20,50 %
+      <button class="themebtn" id="themebtn" type="button">Switch theme</button>
+    </div>
+  </header>
+
+  <div class="kpis">
+    <div class="kpi lead"><span class="k">Cash needed at signing</span><span class="v num" id="k1">—</span><span class="n" id="k1n">—</span></div>
+    <div class="kpi"><span class="k">Year-1 carrying cost</span><span class="v num" id="k2">—</span><span class="n" id="k2n">—</span></div>
+    <div class="kpi"><span class="k">Effective monthly</span><span class="v num" id="k3">—</span><span class="n" id="k3n">—</span></div>
+    <div class="kpi"><span class="k">Net cost over hold</span><span class="v num" id="k4">—</span><span class="n" id="k4n">—</span></div>
+  </div>
+
+  <div class="main">
+    <div class="dossier">
+
+      <section class="card">
+        <div class="sechead"><span class="roman">I</span><h2>Le bien</h2><span class="note">Click an arrondissement to load its indicative €/m².</span></div>
+        <div class="grid2" style="margin-bottom:16px">
+          <div class="field">
+            <label for="price">Purchase price</label>
+            <div class="unit"><input type="number" id="price" value="1450000" min="0" step="5000"><span>€</span></div>
+            <span class="hint" id="pricePerM2">—</span>
+          </div>
+          <div class="field">
+            <label for="surface">Surface (loi Carrez)</label>
+            <div class="unit"><input type="number" id="surface" value="112" min="1" step="1"><span>m²</span></div>
+            <span class="hint">Carrez excludes anything under 1,80 m of height.</span>
+          </div>
+          <div class="field">
+            <label for="ptype">Property type</label>
+            <select id="ptype">
+              <option value="ancien" selected>Ancien — existing resale</option>
+              <option value="neuf">Neuf / VEFA — first sale, under 5 yrs</option>
+            </select>
+            <span class="hint">Neuf pays 0,715 % transfer duty rather than 6,32 %; 20 % TVA already sits inside the price.</span>
+          </div>
+          <div class="field">
+            <label for="dpe">Energy rating (DPE)</label>
+            <select id="dpe">
+              <option>A</option><option>B</option><option>C</option>
+              <option selected>D</option><option>E</option><option>F</option><option>G</option>
+            </select>
+            <span class="hint">Drives the letting bans under the loi Climat et Résilience.</span>
+          </div>
+        </div>
+        <label style="font-size:11px;letter-spacing:.07em;text-transform:uppercase;color:var(--ink-2);font-weight:600;display:block;margin-bottom:8px">Arrondissement · median €/m², laid out roughly as Paris sits on the map</label>
+        <div class="snail" id="snail" role="group" aria-label="Select arrondissement"></div>
+        <div class="snail-legend">
+          <span class="num" id="rampLo">—</span>
+          <span class="bar" aria-hidden="true"><i style="background:var(--ramp1)"></i><i style="background:var(--ramp2)"></i><i style="background:var(--ramp3)"></i><i style="background:var(--ramp4)"></i><i style="background:var(--ramp5)"></i><i style="background:var(--ramp6)"></i><i style="background:var(--ramp7)"></i><i style="background:var(--ramp8)"></i></span>
+          <span class="num" id="rampHi">—</span>
+          <span>€/m², indicative Oct 2026</span>
+        </div>
+      </section>
+
+      <section class="card">
+        <div class="sechead"><span class="roman">II</span><h2>L'acquéreur</h2><span class="note">Tax residence drives nearly everything. Nationality drives less than people expect.</span></div>
+        <div class="grid2">
+          <div class="field">
+            <label for="profile">Status &amp; use</label>
+            <select id="profile">
+              <option value="res-main">French tax resident · main home</option>
+              <option value="res-sec">French tax resident · second home</option>
+              <option value="nr-eu">Non-resident · EU / EEA / Swiss</option>
+              <option value="nr-world" selected>Non-resident · outside EU / EEA</option>
+            </select>
+            <span class="hint" id="profileHint">—</span>
+          </div>
+          <div class="field">
+            <label for="otherRE">Other taxable real estate</label>
+            <div class="unit"><input type="number" id="otherRE" value="0" min="0" step="10000"><span>€</span></div>
+            <span class="hint" id="otherREHint">—</span>
+          </div>
+        </div>
+        <div class="checks">
+          <label class="chk"><input type="checkbox" id="primo"> First-time buyer (primo-accédant)</label>
+          <label class="chk"><input type="checkbox" id="euInsured"> Covered by an EU/EEA/Swiss social security scheme</label>
+          <label class="chk"><input type="checkbox" id="newcomer"> Newly French-resident (non-resident the previous 5 years)</label>
+          <label class="chk"><input type="checkbox" id="usPerson" checked> US citizen or green-card holder</label>
+        </div>
+      </section>
+
+      <section class="card">
+        <div class="sechead"><span class="roman">III</span><h2>Le financement</h2><span class="note">French banks want 20 % down from residents, 20–30 % from non-residents.</span></div>
+        <div class="grid3">
+          <div class="field"><label for="downPct">Deposit</label><div class="unit"><input type="number" id="downPct" value="30" min="0" max="100" step="1"><span>%</span></div><span class="hint num" id="downAbs">—</span></div>
+          <div class="field"><label for="rate">Loan rate</label><div class="unit"><input type="number" id="rate" value="3.45" min="0" step="0.05"><span>%</span></div><span class="hint">Fixed, excluding insurance.</span></div>
+          <div class="field"><label for="term">Term</label><div class="unit"><input type="number" id="term" value="20" min="1" max="30" step="1"><span>yrs</span></div><span class="hint num" id="monthlyPI">—</span></div>
+          <div class="field"><label for="insRate">Borrower insurance</label><div class="unit"><input type="number" id="insRate" value="0.40" min="0" step="0.01"><span>%</span></div><span class="hint">Per year on initial capital. Mandatory in practice.</span></div>
+          <div class="field"><label for="guarPct">Loan guarantee</label><div class="unit"><input type="number" id="guarPct" value="1.0" min="0" step="0.1"><span>%</span></div><span class="hint">Caution ≈ 1 %, hypothèque ≈ 1,5 %.</span></div>
+          <div class="field"><label for="dossier">Bank + broker fees</label><div class="unit"><input type="number" id="dossier" value="1200" min="0" step="100"><span>€</span></div><span class="hint">Frais de dossier and courtage.</span></div>
+        </div>
+        <div class="checks">
+          <label class="chk"><input type="checkbox" id="remise"> Ask the notary for the discount on émoluments above €100 000</label>
+          <label class="chk"><input type="checkbox" id="fx" checked> Funding from a non-euro currency (0,5 % conversion)</label>
+        </div>
+      </section>
+
+      <section class="card">
+        <div class="sechead"><span class="roman">IV</span><h2>La copropriété</h2><span class="note">The most under-budgeted line on any Paris purchase.</span></div>
+        <div class="grid3">
+          <div class="field"><label for="chargeRate">Charges courantes</label><div class="unit"><input type="number" id="chargeRate" value="48" min="0" step="1"><span>€/m²</span></div><span class="hint">Per year. Paris runs €25–60 depending on the building.</span></div>
+          <div class="field"><label for="alur">Fonds de travaux</label><div class="unit"><input type="number" id="alur" value="5" min="0" step="1"><span>%</span></div><span class="hint">Of the budget. Mandatory under the loi ALUR, min 5 %.</span></div>
+          <div class="field"><label for="capex">Works reserve</label><div class="unit"><input type="number" id="capex" value="0.25" min="0" step="0.05"><span>%</span></div><span class="hint">Of value per year — ravalement, lift, roof, DPE works.</span></div>
+        </div>
+        <div class="checks">
+          <label class="chk"><input type="checkbox" id="gardien" checked> Gardien / concierge</label>
+          <label class="chk"><input type="checkbox" id="lift" checked> Lift</label>
+          <label class="chk"><input type="checkbox" id="collHeat" checked> Collective heating &amp; hot water</label>
+          <label class="chk"><input type="checkbox" id="waterInCharges" checked> Water included in charges</label>
+        </div>
+      </section>
+
+      <section class="card">
+        <div class="sechead"><span class="roman">V</span><h2>Impôts locaux et fortune</h2><span class="note">Taxe d'habitation died on main homes in 2023. Second homes still pay, plus Paris's 60 % surcharge.</span></div>
+        <div class="grid3">
+          <div class="field"><label for="tfRate">Taxe foncière</label><div class="unit"><input type="number" id="tfRate" value="32" min="0" step="1"><span>€/m²</span></div><span class="hint">Per year incl. TEOM. Paris raised its rate 52 % in 2023.</span></div>
+          <div class="field"><label for="thRate">Taxe d'habitation</label><div class="unit"><input type="number" id="thRate" value="40" min="0" step="1"><span>€/m²</span></div><span class="hint" id="thHint">—</span></div>
+          <div class="field"><label for="insHome">Home insurance</label><div class="unit"><input type="number" id="insHome" value="400" min="0" step="20"><span>€</span></div><span class="hint">MRH if you occupy, PNO if you let.</span></div>
+        </div>
+      </section>
+
+      <section class="card">
+        <div class="sechead"><span class="roman">VI</span><h2>Charges courantes</h2><span class="note">Anything already inside copropriété charges is excluded automatically.</span></div>
+        <div class="grid3">
+          <div class="field"><label for="occupants">Occupants</label><input type="number" id="occupants" value="2" min="0" step="1"><span class="hint">Drives water and base electricity.</span></div>
+          <div class="field"><label for="heat">Private heating</label>
+            <select id="heat"><option value="none" selected>None — collective</option><option value="elec">Electric</option><option value="gas">Individual gas</option></select>
+            <span class="hint">Paris flats are mostly collective or gas.</span>
+          </div>
+          <div class="field"><label for="internet">Internet</label><div class="unit"><input type="number" id="internet" value="32" min="0" step="1"><span>€/mo</span></div><span class="hint">Fibre; Paris is fully covered.</span></div>
+        </div>
+      </section>
+
+      <section class="card">
+        <div class="sechead"><span class="roman">VII</span><h2>Revenus locatifs</h2><span class="note">Paris caps rents through encadrement des loyers. Check the loyer de référence majoré for the street.</span></div>
+        <div class="checks" style="margin-top:0;margin-bottom:14px">
+          <label class="chk"><input type="checkbox" id="letIt"> I intend to let it out</label>
+        </div>
+        <div class="grid3" id="rentFields">
+          <div class="field"><label for="rent">Monthly rent</label><div class="unit"><input type="number" id="rent" value="3200" min="0" step="50"><span>€</span></div><span class="hint num" id="rentPerM2">—</span></div>
+          <div class="field"><label for="vacancy">Vacancy &amp; arrears</label><div class="unit"><input type="number" id="vacancy" value="6" min="0" max="100" step="1"><span>%</span></div><span class="hint">Paris lets fast, but allow for turnover.</span></div>
+          <div class="field"><label for="mgmt">Management</label><div class="unit"><input type="number" id="mgmt" value="7" min="0" max="100" step="0.5"><span>%</span></div><span class="hint">Of rent collected. Essential from abroad.</span></div>
+          <div class="field"><label for="regime">Tax regime</label>
+            <select id="regime">
+              <option value="reel" selected>Unfurnished · régime réel</option>
+              <option value="micro">Unfurnished · micro-foncier (30 %)</option>
+              <option value="lmnp">Furnished · micro-BIC (50 %)</option>
+            </select>
+            <span class="hint" id="regimeHint">—</span>
+          </div>
+          <div class="field"><label for="irRate">French income tax rate</label><div class="unit"><input type="number" id="irRate" value="20" min="0" max="60" step="1"><span>%</span></div><span class="hint" id="irHint">—</span></div>
+        </div>
+      </section>
+
+      <section class="card">
+        <div class="sechead"><span class="roman">VIII</span><h2>La sortie</h2><span class="note">Gains taper to nothing over 22 years for income tax and 30 for social charges.</span></div>
+        <div class="grid3">
+          <div class="field"><label for="hold">Hold period</label><div class="unit"><input type="number" id="hold" value="10" min="1" max="40" step="1"><span>yrs</span></div><span class="hint num" id="holdHint">—</span></div>
+          <div class="field"><label for="growth">Value growth</label><div class="unit"><input type="number" id="growth" value="1.0" step="0.1"><span>%/yr</span></div><span class="hint">Paris fell about 10 % from its 2020 peak. Be conservative.</span></div>
+          <div class="field"><label for="inflation">Cost inflation</label><div class="unit"><input type="number" id="inflation" value="2.5" min="0" step="0.1"><span>%/yr</span></div><span class="hint">Applied to charges, taxes and utilities.</span></div>
+          <div class="field"><label for="saleFee">Agency fee on sale</label><div class="unit"><input type="number" id="saleFee" value="4" min="0" step="0.5"><span>%</span></div><span class="hint">Borne by the seller in France.</span></div>
+        </div>
+      </section>
+
+      <section class="card usa" id="usaCard">
+        <div class="sechead"><span class="roman">IX</span><h2>Le contribuable américain</h2><span class="note">The US taxes citizens wherever they live. France gets first bite; the IRS measures the same deal in dollars.</span></div>
+        <div class="grid3">
+          <div class="field"><label for="fxBuy">EUR/USD at purchase</label><input type="number" id="fxBuy" value="1.08" min="0.5" max="2" step="0.01"><span class="hint">Dollars per euro on the day you sign.</span></div>
+          <div class="field"><label for="fxSell">EUR/USD at sale</label><input type="number" id="fxSell" value="1.18" min="0.5" max="2" step="0.01"><span class="hint">Move this to see the phantom dollar gain.</span></div>
+          <div class="field"><label for="usLtcg">US long-term gains rate</label><div class="unit"><input type="number" id="usLtcg" value="20" min="0" max="40" step="1"><span>%</span></div><span class="hint">15 % or 20 % federal, plus any state.</span></div>
+          <div class="field"><label for="usMarginal">US marginal rate on rent</label><div class="unit"><input type="number" id="usMarginal" value="32" min="0" max="50" step="1"><span>%</span></div><span class="hint">Rental profit is ordinary income — the FEIE never shelters it.</span></div>
+          <div class="field"><label for="usState">State tax on the gain</label><div class="unit"><input type="number" id="usState" value="0" min="0" max="15" step="0.5"><span>%</span></div><span class="hint">Nine states levy none. California taxes it in full with no foreign credit.</span></div>
+        </div>
+        <div class="checks">
+          <label class="chk"><input type="checkbox" id="filingJoint" checked> Married filing jointly</label>
+          <label class="chk"><input type="checkbox" id="niit" checked> Income above the NIIT threshold (3,8 %)</label>
+          <label class="chk"><input type="checkbox" id="viaSCI"> Buying through an SCI</label>
+        </div>
+      </section>
+
+    </div>
+
+    <aside class="decompte">
+      <div class="dc-head">
+        <div class="t">Décompte</div>
+        <div class="s" id="dcSub">—</div>
+      </div>
+      <div class="dc-body">
+        <div class="dc-group"><h3>À verser chez le notaire</h3><div id="dcSign"></div></div>
+        <div class="dc-group"><h3>Charges annuelles · année 1</h3><div id="dcAnnual"></div></div>
+        <div class="dc-group"><h3>Mensualité</h3><div id="dcMonthly"></div></div>
+        <div class="dc-group" id="dcExitWrap"><h3>À la revente</h3><div id="dcExit"></div></div>
+      </div>
+    </aside>
+  </div>
+
+  <div class="band">
+    <section class="card">
+      <div class="charthead"><h2>Where the annual cost goes</h2><p id="stackSub">—</p></div>
+      <div class="stack" id="stack" role="img" aria-labelledby="stackSub"></div>
+      <div class="legend" id="stackLegend"></div>
+    </section>
+    <section class="card">
+      <div class="charthead"><h2>Carrying cost by year</h2><p id="sparkSub">—</p></div>
+      <div class="spark" id="spark" role="img" aria-labelledby="sparkSub"></div>
+      <div class="legend">
+        <div class="lg"><span class="sw" style="background:var(--s2)"></span><span class="nm">Ownership costs</span><span class="vv num" id="lgOwn">—</span></div>
+        <div class="lg"><span class="sw" style="background:var(--s1)"></span><span class="nm">Mortgage interest</span><span class="vv num" id="lgInt">—</span></div>
+        <div class="lg"><span class="nm">Peak year</span><span class="vv num" id="peakYear">—</span></div>
+        <div class="lg"><span class="nm">Cumulative over hold</span><span class="vv num" id="cumHold">—</span></div>
+      </div>
+    </section>
+  </div>
+
+  <div class="ledgers">
+    <section class="card">
+      <div class="tscroll"><table>
+        <caption>Frais d'acquisition</caption>
+        <thead><tr><th>Line</th><th class="r">Amount</th></tr></thead>
+        <tbody id="tblAcq"></tbody>
+      </table></div>
+      <p class="cap-note" id="acqNote"></p>
+    </section>
+    <section class="card">
+      <div class="tscroll"><table>
+        <caption>Charges annuelles · année 1</caption>
+        <thead><tr><th>Line</th><th class="r">Amount</th></tr></thead>
+        <tbody id="tblAnn"></tbody>
+      </table></div>
+    </section>
+  </div>
+
+  <div class="ledgers">
+    <section class="card">
+      <div class="tscroll"><table>
+        <caption>Plus-value à la revente</caption>
+        <thead><tr><th>Line</th><th class="r">Amount</th></tr></thead>
+        <tbody id="tblExit"></tbody>
+      </table></div>
+      <p class="cap-note" id="exitNote"></p>
+    </section>
+    <section class="card usa" id="usaLedger">
+      <div class="tscroll"><table>
+        <caption>The US side of the same deal</caption>
+        <thead><tr><th>Line</th><th class="r">Amount (USD)</th></tr></thead>
+        <tbody id="tblUS"></tbody>
+      </table></div>
+      <p class="cap-note" id="usNote"></p>
+    </section>
+  </div>
+
+  <section class="watch">
+    <div class="charthead"><h2>Also worth knowing</h2><p>Flags raised by the figures above, plus the rules that reliably catch foreign buyers out.</p></div>
+    <div class="wlist" id="watch"></div>
+  </section>
+
+  <section class="notes">
+    <h2>How each figure is built</h2>
+    <div class="ncols">
+      <h3>Droits de mutation</h3>
+      <p>Paris was the first department to use the 2025 Finance Act option, lifting its departmental rate from 4,50 % to 5,00 % for deeds signed from 1 April 2025 and in force to 31 March 2028. With the 1,20 % communal tax and the 2,37 % collection levy on the departmental share, the total is <code>6,32 %</code>. First-time buyers of a main home are excluded from the increase and pay <code>5,81 %</code>. New-build first sales pay <code>0,715 %</code> instead, with 20 % TVA already inside the price.</p>
+
+      <h3>Émoluments du notaire</h3>
+      <p>A regulated regressive scale, not a negotiable fee: 3,870 % to €6 500, then 1,596 % to €17 000, 1,064 % to €60 000, and 0,799 % above, plus 20 % TVA. Since 2021 a notary may discount up to 20 % of the émoluments attributable to the slice of price above €100 000 — worth asking for on a large purchase. Add the 0,10 % contribution de sécurité immobilière and roughly €1 200 of disbursements.</p>
+
+      <h3>Taxe foncière and taxe d'habitation</h3>
+      <p>Both are assessed on a cadastral rental value that bears little relation to market price, so this tool uses a €/m² estimate you should replace with the seller's actual bill. Paris raised its taxe foncière rate from 13,50 % to 20,50 % in 2023. Taxe d'habitation no longer applies to main homes, but second homes pay it <em>and</em> Paris applies the maximum 60 % surcharge.</p>
+
+      <h3>IFI — the million-euro question</h3>
+      <p>The wealth tax on property bites when <em>net</em> taxable real estate exceeds €1 300 000 on 1 January. Net is the operative word: outstanding mortgage principal is deductible and a main residence gets a 30 % allowance. Once you cross, the scale applies from €800 000 — 0,50 % to €1,3 M, 0,70 % to €2,57 M, 1 % to €5 M, 1,25 % to €10 M, then 1,50 % — with a smoothing rebate between €1,3 M and €1,4 M. A heavily mortgaged purchase can sit under the threshold on day one and cross it years later as the loan amortises, which is why the projection marks the crossing year.</p>
+
+      <h3>Resident, non-resident, citizen</h3>
+      <p>French <em>tax residence</em> — home, main stay, professional activity, or centre of economic interests — is what moves the numbers. Nationality on its own changes little. Where it does matter: social charges on rent and gains fall from 17,2 % to 7,5 % if you are covered by an EU, EEA or Swiss social security scheme; non-residents from outside the EU/EEA must appoint an accredited <em>représentant fiscal</em> to sell above €150 000; and non-EU buyers need a long-stay visa to actually live in what they bought.</p>
+
+      <h3>Arriving in France changes the IFI base</h3>
+      <p>Become French tax resident and IFI reaches your worldwide property — your house in Austin counts. Article 964 of the tax code shields newcomers: anyone non-resident for the five previous calendar years is taxed on French property only, for the five years following arrival. That window is the single best planning opportunity an arriving expat has, and it closes on a date, not on a transaction.</p>
+
+      <h3>Rental income</h3>
+      <p>Non-residents face a minimum 20 % French income-tax rate on rental profit, plus social charges. Unfurnished letting under €15 000 gross can use micro-foncier and its 30 % allowance; <em>régime réel</em> instead deducts interest, charges, taxe foncière, insurance and management, which usually wins on a mortgaged purchase and can throw up a <em>déficit foncier</em> of up to €10 700 against other income. Furnished letting runs through micro-BIC at a 50 % allowance. Paris caps rents through <em>encadrement des loyers</em>; short-term letting needs a registration number, a <em>changement d'usage</em> with commercial compensation for anything that is not your main home, and a 120-night ceiling if it is.</p>
+
+      <h3>Capital gains on exit</h3>
+      <p>19 % income tax plus social charges on the net gain, with a surtax of 2–6 % above €50 000. Allowances for length of ownership start in year 6 and reach full exemption at 22 years for income tax, 30 for social charges. The acquisition cost is uplifted by actual purchase costs or a flat 7,5 %, plus a flat 15 % for works once held beyond five years. A French tax resident selling their main home is exempt outright.</p>
+
+      <h3>Succession — the one people miss</h3>
+      <p>French law reserves a fixed share of an estate for children and overrides a foreign will by default. EU Succession Regulation 650/2012 lets you elect the law of your nationality instead, but the election must be made expressly and in writing while you are alive. French inheritance tax between unrelated people reaches 60 %, and step-children and unmarried partners are treated as strangers.</p>
+
+      <h3>American expats: the second tax return</h3>
+      <p>US citizens and green-card holders file on worldwide income wherever they live, so every French number here has a dollar twin. The Foreign Earned Income Exclusion covers wages only — rental profit and capital gains are never sheltered by it. The France–US treaty gives France the primary right to tax French property income and gains, and the US relieves double taxation by credit on Form 1116; since 2019 the IRS has accepted CSG and CRDS as creditable income taxes rather than social security contributions, which materially improves the arithmetic.</p>
+
+      <h3>Where the credit runs out</h3>
+      <p>Three leaks. The 3,8 % Net Investment Income Tax is not creditable against foreign tax, so it stacks on top. Most states give no foreign tax credit at all — California taxes the gain in full. And IFI is a wealth tax, not an income tax, so it earns no US credit whatsoever: it is pure extra cost.</p>
+
+      <h3>The dollar measures a different gain</h3>
+      <p>The IRS computes basis and proceeds in dollars at the spot rate on each date, so a flat euro price can still produce a taxable dollar gain purely from currency movement — or wipe out a real euro gain. French taper relief has no US equivalent, so the longer you hold the more likely it is that France taxes nothing, you have no credit to claim, and the entire dollar gain lands on your US return. Paying down a euro mortgage with a strengthened dollar can also trigger section 988 currency gain on the debt itself.</p>
+
+      <h3>Other US tripwires</h3>
+      <p>Section 121 can exclude $250 000 of gain, $500 000 if married filing jointly, on a foreign home that was your main residence for two of the last five years. Depreciation on foreign residential rental runs over 30 years under ADS, is mandatory, and is recaptured on sale whether or not you claimed it. The TCJA abolished the deduction for foreign real property taxes, so your taxe foncière is not deductible, though mortgage interest on up to $750 000 of qualified-residence debt still is. An SCI — the standard French succession wrapper — may be a foreign corporation or partnership for US purposes, dragging in Form 5471 or 8865, Form 8858, and possible PFIC treatment; check the box before you sign, not after. FBAR covers French accounts over $10 000 aggregate and Form 8938 has its own thresholds. Finally, the US taxes worldwide estates, and the 1978 France–US estate tax treaty is what keeps the same assets from being taxed twice.</p>
+    </div>
+    <p class="disc"><b>An estimate, not advice.</b> Rates and thresholds are those published for 2026 and change with every Finance Act. Cadastral-value taxes are modelled from €/m² heuristics and will differ from a real bill, and the US figures are a federal sketch that ignores AMT, carryovers, basis adjustments and your actual bracket. Get a <em>simulation des frais</em> from the notaire, three years of charges and minutes from the syndic, and advice from a French tax adviser plus a US cross-border CPA before committing.</p>
+  </section>
+</div>
+
+<script>
+"use strict";
+const $ = id => document.getElementById(id);
+const eur  = n => new Intl.NumberFormat('fr-FR',{style:'currency',currency:'EUR',maximumFractionDigits:0}).format(Math.round(n||0));
+const usd  = n => new Intl.NumberFormat('en-US',{style:'currency',currency:'USD',maximumFractionDigits:0}).format(Math.round(n||0));
+const num0 = n => new Intl.NumberFormat('fr-FR',{maximumFractionDigits:0}).format(Math.round(n||0));
+const pc   = n => new Intl.NumberFormat('fr-FR',{minimumFractionDigits:2,maximumFractionDigits:2}).format(n)+' %';
+const pc0  = n => new Intl.NumberFormat('fr-FR',{maximumFractionDigits:1}).format(n)+' %';
+
+/* arrondissement medians (€/m², indicative Oct 2026) laid out as Paris's snail */
+const ARR = [
+  {a:1 ,p:12650,c:3,r:3},{a:2 ,p:11300,c:3,r:2},{a:3 ,p:12400,c:4,r:3},{a:4 ,p:13100,c:4,r:4},
+  {a:5 ,p:12600,c:4,r:5},{a:6 ,p:14900,c:3,r:4},{a:7 ,p:14200,c:2,r:3},{a:8 ,p:12100,c:1,r:2},
+  {a:9 ,p:11200,c:2,r:2},{a:10,p:10050,c:4,r:2},{a:11,p:10300,c:5,r:3},{a:12,p: 9450,c:5,r:4},
+  {a:13,p: 9350,c:5,r:5},{a:14,p:10150,c:3,r:5},{a:15,p:10200,c:2,r:4},{a:16,p:11250,c:1,r:3},
+  {a:17,p:10750,c:2,r:1},{a:18,p: 9500,c:3,r:1},{a:19,p: 8600,c:4,r:1},{a:20,p: 8900,c:5,r:2}
+];
+let selectedArr = 7;
+const RAMP = ['--ramp1','--ramp2','--ramp3','--ramp4','--ramp5','--ramp6','--ramp7','--ramp8'];
+
+function buildSnail(){
+  const lo = Math.min(...ARR.map(x=>x.p)), hi = Math.max(...ARR.map(x=>x.p));
+  $('rampLo').textContent = num0(lo); $('rampHi').textContent = num0(hi);
+  const host = $('snail'); host.innerHTML = '';
+  for(const x of ARR){
+    const step = Math.min(7, Math.floor(((x.p-lo)/(hi-lo))*8));
+    const b = document.createElement('button');
+    b.type = 'button'; b.className = 'arr';
+    b.style.setProperty('--c',x.c); b.style.setProperty('--r',x.r);
+    b.style.background = `var(${RAMP[step]})`;
+    b.style.color = step>=4 ? 'var(--ramp-ink-hi)' : 'var(--ramp-ink-lo)';
+    b.setAttribute('aria-pressed', String(x.a===selectedArr));
+    b.setAttribute('aria-label', `${x.a}e arrondissement, ${num0(x.p)} euros per square metre`);
+    b.innerHTML = `${x.a}<small>${(x.p/1000).toFixed(1).replace('.',',')}k</small>`;
+    b.addEventListener('click', ()=>{
+      selectedArr = x.a;
+      const s = Math.max(1, parseFloat($('surface').value)||1);
+      $('price').value = Math.round(x.p*s/1000)*1000;
+      buildSnail(); compute();
+    });
+    host.appendChild(b);
+  }
+}
+
+/* regulated notary scale */
+function emoluments(p){
+  const t = [[6500,0.03870],[17000,0.01596],[60000,0.01064],[Infinity,0.00799]];
+  let prev=0, sum=0;
+  for(const [cap,rate] of t){ if(p<=prev) break; sum += (Math.min(p,cap)-prev)*rate; prev=cap; }
+  return sum;
+}
+/* IFI scale, with the 1,3–1,4 M smoothing rebate */
+function ifi(base){
+  if(base < 1300000) return 0;
+  const br = [[800000,0],[1300000,0.005],[2570000,0.007],[5000000,0.01],[10000000,0.0125],[Infinity,0.015]];
+  let prev=0, t=0;
+  for(const [cap,r] of br){ if(base<=prev) break; t += (Math.min(base,cap)-prev)*r; prev=cap; }
+  if(base <= 1400000) t -= Math.max(0, 17500 - 0.0125*base);
+  return Math.max(0,t);
+}
+function schedule(L, annualRate, years){
+  const n = Math.max(1, Math.round(years*12)), r = annualRate/12;
+  const m = r===0 ? L/n : L*r/(1-Math.pow(1+r,-n));
+  let bal = L; const y = [];
+  for(let k=1;k<=40;k++){
+    let int=0, prin=0;
+    for(let mo=0;mo<12;mo++){
+      if(bal<=0.01) break;
+      const i = bal*r; let p = m-i; if(p>bal) p=bal; if(p<0) p=0;
+      bal -= p; int += i; prin += p;
+    }
+    y.push({interest:int, principal:prin, balance:Math.max(bal,0)});
+  }
+  return {monthly:m, y};
+}
+const taperIR  = y => y<6 ? 0 : y>=22 ? 1 : (y-5)*0.06;
+const taperSoc = y => y<6 ? 0 : y>=30 ? 1 : y>=22 ? 0.28+(y-22)*0.09 : (y-5)*0.0165;
+function surtax(g){
+  if(g<=50000) return 0;
+  const t = [[60000,0.02],[100000,0.03],[110000,0.04],[150000,0.05],[Infinity,0.06]];
+  let prev=50000, s=0;
+  for(const [cap,r] of t){ if(g<=prev) break; s += (Math.min(g,cap)-prev)*r; prev=cap; }
+  return s;
+}
+
+const SERIES = [
+  {k:'interest', n:'Mortgage interest',   v:'--s1', o:'--on1'},
+  {k:'copro',    n:'Copropriété charges', v:'--s2', o:'--on2'},
+  {k:'tf',       n:'Taxe foncière',       v:'--s3', o:'--on3'},
+  {k:'th',       n:"Taxe d'habitation",   v:'--s4', o:'--on4'},
+  {k:'works',    n:'Works reserve',       v:'--s5', o:'--on5'},
+  {k:'utils',    n:'Utilities',           v:'--s6', o:'--on6'},
+  {k:'ins',      n:'Insurance',           v:'--s7', o:'--on7'},
+  {k:'ifi',      n:'IFI wealth tax',      v:'--s8', o:'--on8'}
+];
+
+function model(){
+  const g = id => { const v = parseFloat($(id).value); return isFinite(v) ? v : 0; };
+  const b = id => $(id).checked;
+
+  const price = Math.max(0, g('price')), surface = Math.max(1, g('surface'));
+  const profile = $('profile').value, neuf = $('ptype').value==='neuf';
+  const isPrimary = profile==='res-main', isResident = profile.startsWith('res');
+  const isNonEU = profile==='nr-world';
+  const primo = b('primo') && isPrimary;
+  const socialRate = (profile==='nr-eu' || b('euInsured')) ? 0.075 : 0.172;
+  const newcomer = b('newcomer') && isResident;
+
+  /* transfer duties */
+  const deptRate = primo ? 0.045 : 0.05;
+  const dmtoRate = neuf ? 0.007*1.0237 : (deptRate + 0.012 + deptRate*0.0237);
+  const dmto = price * dmtoRate;
+
+  /* notary */
+  const remise = b('remise') ? 0.20*Math.max(0, price-100000)*0.00799 : 0;
+  const emoTTC = (emoluments(price) - remise) * 1.20;
+  const csi = Math.max(15, price*0.001);
+  const debours = 1200;
+  const acqFees = dmto + emoTTC + csi + debours;
+
+  /* financing */
+  const downPct = Math.min(100, Math.max(0, g('downPct')));
+  const down = price*downPct/100;
+  const loan = Math.max(0, price-down);
+  const sch = schedule(loan, g('rate')/100, Math.max(1,g('term')));
+  const guarantee = loan*g('guarPct')/100;
+  const bankFees = g('dossier');
+  const insLoanYr = loan*g('insRate')/100;
+  const fxCost = b('fx') ? (down+acqFees+guarantee+bankFees)*0.005 : 0;
+  const cashAtSigning = down + acqFees + guarantee + bankFees + fxCost;
+
+  /* recurring */
+  const coproBase = g('chargeRate')*surface;
+  const alur = coproBase*g('alur')/100;
+  const copro = coproBase + alur;
+  const works = price*g('capex')/100;
+  const tf = g('tfRate')*surface;
+  const th = isPrimary ? 0 : g('thRate')*surface;
+  const insHome = g('insHome');
+  const ins = insHome + insLoanYr;
+
+  const occ = Math.max(0,g('occupants')), heat = $('heat').value;
+  const elecAbo = 163;
+  let kwhElec = surface*25 + occ*350;
+  if(heat==='elec') kwhElec += surface*85;
+  const elec = elecAbo + kwhElec*0.2016;
+  const gas = heat==='gas' ? 240 + surface*90*0.113 : 0;
+  const water = b('waterInCharges') ? 0 : occ*45*3.90;
+  const internet = g('internet')*12;
+  const utils = elec + gas + water + internet;
+
+  /* IFI — newcomer shield excludes non-French property for 5 years */
+  const otherRE = g('otherRE');
+  const ifiOther = y => (newcomer && y<=5) ? 0 : otherRE;
+  const ifiBase0 = Math.max(0, price*(isPrimary?0.70:1) + ifiOther(1) - loan);
+  const ifiY1 = ifi(ifiBase0);
+
+  /* letting */
+  const letIt = b('letIt'), regime = $('regime').value;
+  const grossRent = letIt ? g('rent')*12 : 0;
+  const collected = grossRent*(1-g('vacancy')/100);
+  const mgmtFee = collected*g('mgmt')/100;
+  let taxableRent = 0, allowance = 0, deductions = 0;
+  if(letIt){
+    if(regime==='micro'){ allowance = collected*0.30; taxableRent = collected-allowance; }
+    else if(regime==='lmnp'){ allowance = collected*0.50; taxableRent = collected-allowance; }
+    else {
+      deductions = sch.y[0].interest + coproBase + tf + insHome + mgmtFee;
+      taxableRent = Math.max(0, collected - deductions);
+    }
+  }
+  const rentIR = taxableRent*g('irRate')/100;
+  const rentSocial = taxableRent*socialRate;
+  const netRent = letIt ? collected - mgmtFee - rentIR - rentSocial : 0;
+
+  const y1 = {interest:sch.y[0].interest, copro, tf, th, works, utils, ins, ifi:ifiY1};
+  const annualCarry = Object.values(y1).reduce((a,c)=>a+c,0);
+  const ownershipOnly = annualCarry - sch.y[0].interest;
+  const allInYear1 = ownershipOnly + sch.monthly*12;
+
+  /* projection */
+  const hold = Math.max(1, Math.round(g('hold')));
+  const infl = g('inflation')/100, growth = g('growth')/100;
+  const years = []; let cumOut = 0, cumRent = 0, ifiCrossYear = null;
+  for(let y=1; y<=Math.max(hold,10); y++){
+    const f = Math.pow(1+infl, y-1);
+    const s = sch.y[y-1] || {interest:0, principal:0, balance:0};
+    const value = price*Math.pow(1+growth, y);
+    const base = Math.max(0, value*(isPrimary?0.70:1) + ifiOther(y) - s.balance);
+    const ifiY = ifi(base);
+    if(ifiCrossYear===null && ifiY>0) ifiCrossYear = y;
+    const own = copro*f + tf*f + th*f + works*Math.pow(1+growth,y-1) + utils*f + insHome*f + insLoanYr + ifiY;
+    const mort = s.interest + s.principal;
+    const rent = netRent*f;
+    years.push({y, own, interest:s.interest, mort, ifi:ifiY, rent, total:own+mort, balance:s.balance, value});
+    if(y<=hold){ cumOut += own+mort; cumRent += rent; }
+  }
+
+  /* exit */
+  const last = years[hold-1];
+  const saleValue = price*Math.pow(1+growth, hold);
+  const saleAgency = saleValue*g('saleFee')/100;
+  const flatCosts = Math.max(acqFees, price*0.075);
+  const worksUplift = hold>5 ? price*0.15 : 0;
+  const acqForPV = price + flatCosts + worksUplift;
+  const rawGain = Math.max(0, saleValue - acqForPV);
+  const exempt = isPrimary;
+  const gainIR  = exempt ? 0 : rawGain*(1-taperIR(hold));
+  const gainSoc = exempt ? 0 : rawGain*(1-taperSoc(hold));
+  const pvIR = gainIR*0.19, pvSoc = gainSoc*socialRate, pvSur = surtax(gainIR);
+  const pvTax = pvIR + pvSoc + pvSur;
+  const fiscalRep = (isNonEU && saleValue>150000) ? saleValue*0.005 : 0;
+  const netProceeds = saleValue - saleAgency - last.balance - pvTax - fiscalRep;
+  const netCost = (cashAtSigning + cumOut - cumRent) - netProceeds;
+
+  /* ---- US side ---- */
+  const usPerson = b('usPerson');
+  const fxBuy = g('fxBuy')||1, fxSell = g('fxSell')||1;
+  const usBasis = (price + acqFees)*fxBuy;
+  const usProceeds = (saleValue - saleAgency)*fxSell;
+  const usGainRaw = usProceeds - usBasis;
+  const s121Cap = b('filingJoint') ? 500000 : 250000;
+  const s121 = (isPrimary && hold>=2) ? Math.min(Math.max(0,usGainRaw), s121Cap) : 0;
+  const usGain = Math.max(0, usGainRaw - s121);
+  const usTaxGross = usGain*g('usLtcg')/100;
+  const usNIIT = b('niit') ? usGain*0.038 : 0;
+  const usStateTax = usGain*g('usState')/100;
+  const ftc = Math.min(usTaxGross, pvTax*fxSell);
+  const usNetGainTax = Math.max(0, usTaxGross - ftc) + usNIIT + usStateTax;
+  /* rent, US side */
+  const usDepr = letIt ? (price*fxBuy*0.80)/30 : 0;
+  const usRentDeduct = letIt ? (sch.y[0].interest + coproBase + tf + insHome + mgmtFee)*fxBuy : 0;
+  const usRentProfit = letIt ? Math.max(0, collected*fxBuy - usRentDeduct - usDepr) : 0;
+  const usRentTaxGross = usRentProfit*g('usMarginal')/100;
+  const usRentNIIT = (letIt && b('niit')) ? usRentProfit*0.038 : 0;
+  const usRentFTC = Math.min(usRentTaxGross, (rentIR+rentSocial)*fxBuy);
+  const usRentTax = Math.max(0, usRentTaxGross - usRentFTC) + usRentNIIT;
+  const euroGainInUsd = rawGain*fxSell;
+  const fxPhantom = usGainRaw - euroGainInUsd;
+
+  return {price,surface,profile,isPrimary,isResident,isNonEU,primo,neuf,socialRate,newcomer,
+    dmtoRate,dmto,emoTTC,remise,csi,debours,acqFees,
+    down,downPct,loan,sch,guarantee,bankFees,insLoanYr,fxCost,cashAtSigning,
+    coproBase,alur,copro,works,tf,th,insHome,ins,elec,gas,water,internet,utils,
+    otherRE,ifiBase0,ifiY1,ifiCrossYear,y1,annualCarry,ownershipOnly,allInYear1,
+    letIt,regime,grossRent,collected,mgmtFee,allowance,deductions,taxableRent,rentIR,rentSocial,netRent,
+    hold,years,cumOut,cumRent,saleValue,saleAgency,flatCosts,worksUplift,acqForPV,
+    rawGain,exempt,gainIR,gainSoc,pvIR,pvSoc,pvSur,pvTax,fiscalRep,netProceeds,netCost,lastBalance:last.balance,
+    usPerson,fxBuy,fxSell,usBasis,usProceeds,usGainRaw,s121,s121Cap,usGain,usTaxGross,usNIIT,usStateTax,ftc,
+    usNetGainTax,usDepr,usRentProfit,usRentTaxGross,usRentNIIT,usRentFTC,usRentTax,euroGainInUsd,fxPhantom,
+    viaSCI:b('viaSCI'), dpe:$('dpe').value};
+}
+
+const li  = (lab,val,zero,cr) => `<div class="li${zero?' zero':''}${cr?' cr':''}"><span class="lab">${lab}</span><span class="dots"></span><span class="val">${val}</span></div>`;
+const sum = (lab,val) => `<div class="li sum"><span class="lab">${lab}</span><span class="val">${val}</span></div>`;
+const row = (lab,basis,val,cls) => `<tr class="${cls||''}"><td>${lab}${basis?`<span class="basis">${basis}</span>`:''}</td><td class="r">${val}</td></tr>`;
+const tot = (lab,val) => `<tr class="tot"><td>${lab}</td><td class="r">${val}</td></tr>`;
+
+function compute(){
+  const m = model();
+  $('usaCard').hidden = !m.usPerson;
+  $('usaLedger').hidden = !m.usPerson;
+  $('rentFields').style.display = m.letIt ? '' : 'none';
+
+  /* hints */
+  $('pricePerM2').textContent = `${num0(m.price/m.surface)} €/m² · ${m.surface} m² in the ${selectedArr}${selectedArr===1?'er':'e'}`;
+  $('downAbs').textContent = `${eur(m.down)} down · ${eur(m.loan)} borrowed`;
+  $('monthlyPI').textContent = `${eur(m.sch.monthly)}/mo capital + interest`;
+  $('holdHint').textContent = `IR taper ${Math.round(taperIR(m.hold)*100)} % · social ${Math.round(taperSoc(m.hold)*100)} %`;
+  $('thHint').textContent = m.isPrimary ? 'Abolished on main homes since 2023 — not charged.' : 'Second home, incl. the 60 % Paris surcharge.';
+  $('profileHint').textContent = ({
+    'res-main':'Main home: no taxe d’habitation, 30 % IFI allowance, gain exempt on sale.',
+    'res-sec' :'Second home: taxe d’habitation with the Paris surcharge, gain taxable.',
+    'nr-eu'   :'Social charges 7,5 %, no fiscal representative needed to sell.',
+    'nr-world':'Social charges 17,2 %; accredited fiscal representative needed to sell above €150 000.'
+  })[m.profile];
+  $('otherREHint').textContent = m.newcomer
+    ? 'Shielded from IFI for 5 years under CGI art. 964 — then it counts.'
+    : m.isResident ? 'Residents declare worldwide property for IFI.' : 'Non-residents declare French property only.';
+  $('rentPerM2').textContent = `${num0(m.grossRent/12/m.surface)} €/m²/mo · ${pc0(m.grossRent/m.price*100)} gross yield`;
+  $('regimeHint').textContent = ({
+    reel:'Deducts interest, charges, taxe foncière, insurance and management. Usually wins when mortgaged.',
+    micro:'Flat 30 % allowance, gross rent under €15 000 only.',
+    lmnp:'Flat 50 % allowance, furnished, gross under €77 700.'
+  })[m.regime];
+  $('irHint').textContent = m.isResident ? 'Your marginal French rate.' : 'Minimum 20 % applies to non-residents.';
+
+  /* KPIs */
+  $('k1').textContent = eur(m.cashAtSigning);
+  $('k1n').textContent = `${eur(m.down)} deposit + ${eur(m.cashAtSigning-m.down)} duties and fees`;
+  $('k2').textContent = eur(m.allInYear1);
+  $('k2n').textContent = m.letIt
+    ? `${eur(m.allInYear1-m.netRent)} net of ${eur(m.netRent)} after-tax rent`
+    : `incl. ${eur(m.sch.monthly*12)} of mortgage payments`;
+  $('k3').textContent = eur(m.allInYear1/12);
+  $('k3n').textContent = `${eur(m.annualCarry/12)}/mo excluding principal repaid`;
+  $('k4').textContent = eur(m.netCost);
+  $('k4n').textContent = `over ${m.hold} yrs, selling at ${eur(m.saleValue)}`;
+
+  /* décompte */
+  $('dcSub').textContent = `${m.neuf?'Neuf':'Ancien'} · ${num0(m.price)} € · ${m.surface} m² · ${({'res-main':'resident, main home','res-sec':'resident, second home','nr-eu':'non-resident EU','nr-world':'non-resident, non-EU'})[m.profile]}`;
+  $('dcSign').innerHTML =
+    li('Deposit (apport)', eur(m.down)) +
+    li(`Droits de mutation · ${pc(m.dmtoRate*100)}`, eur(m.dmto)) +
+    li('Émoluments du notaire TTC', eur(m.emoTTC)) +
+    li('Sécurité immobilière + débours', eur(m.csi+m.debours)) +
+    li('Loan guarantee', m.guarantee?eur(m.guarantee):'—', !m.guarantee) +
+    li('Bank &amp; broker fees', m.bankFees?eur(m.bankFees):'—', !m.bankFees) +
+    li('Currency conversion', m.fxCost?eur(m.fxCost):'—', !m.fxCost) +
+    sum('Cash at signing', eur(m.cashAtSigning));
+  $('dcAnnual').innerHTML =
+    li('Copropriété charges', eur(m.copro)) +
+    li('Works reserve', eur(m.works)) +
+    li('Taxe foncière', eur(m.tf)) +
+    li("Taxe d'habitation", m.th?eur(m.th):'—', !m.th) +
+    li('Insurance', eur(m.ins)) +
+    li('Utilities', eur(m.utils)) +
+    li('IFI', m.ifiY1?eur(m.ifiY1):'—', !m.ifiY1) +
+    (m.letIt ? li('Net rent after tax', '+ '+eur(m.netRent), false, true) : '') +
+    sum(m.letIt?'Net ownership cost':'Ownership cost', eur(m.ownershipOnly - m.netRent));
+  $('dcMonthly').innerHTML =
+    li('Capital + interest', eur(m.sch.monthly)) +
+    li('Borrower insurance', eur(m.insLoanYr/12)) +
+    li('Ownership costs', eur((m.ownershipOnly-m.insLoanYr)/12)) +
+    (m.letIt ? li('Net rent', '+ '+eur(m.netRent/12), false, true) : '') +
+    sum('All-in monthly', eur((m.allInYear1-m.netRent)/12));
+  $('dcExit').innerHTML =
+    li(`Sale price, year ${m.hold}`, eur(m.saleValue)) +
+    li('Agency fee', '− '+eur(m.saleAgency)) +
+    li('Mortgage balance', '− '+eur(m.lastBalance)) +
+    li('Plus-value tax', m.pvTax?'− '+eur(m.pvTax):'—', !m.pvTax) +
+    li('Fiscal representative', m.fiscalRep?'− '+eur(m.fiscalRep):'—', !m.fiscalRep) +
+    sum('Net proceeds', eur(m.netProceeds)) +
+    (m.usPerson ? li('US tax on the same sale', m.usNetGainTax?'− '+usd(m.usNetGainTax):'—', !m.usNetGainTax) : '');
+
+  /* stacked composition */
+  const total = m.annualCarry || 1;
+  const rows = SERIES.map(s=>({...s, val:m.y1[s.k]||0, sh:(m.y1[s.k]||0)/total}));
+  $('stack').innerHTML = rows.filter(r=>r.val>0).map(r=>
+    `<div class="seg" style="flex:${r.sh} 1 0; background:var(${r.v}); color:var(${r.o})" title="${r.n}: ${eur(r.val)}">${r.sh>=0.085?`<b>${Math.round(r.sh*100)}%</b>`:''}</div>`).join('');
+  $('stackLegend').innerHTML = rows.map(r=>
+    `<div class="lg${r.val===0?' off':''}"><span class="sw" style="background:var(${r.v})"></span><span class="nm">${r.n}</span><span class="vv">${r.val===0?'—':eur(r.val)}</span><span class="pp">${r.val===0?'':Math.round(r.sh*100)+'%'}</span></div>`).join('');
+  $('stackSub').textContent = `Year-1 carrying cost of ${eur(m.annualCarry)}, excluding the ${eur(m.sch.y[0].principal)} of principal repaid — that buys equity rather than disappearing.`;
+
+  /* yearly columns */
+  const show = m.years.slice(0, m.hold);
+  const peak = Math.max(...show.map(y=>y.total)) || 1;
+  $('spark').innerHTML = show.map(y=>{
+    const h = Math.max(3, (y.total/peak)*80);
+    const iH = h*(y.interest/(y.total||1));
+    return `<div class="col" data-hit="${m.ifiCrossYear===y.y}" title="Year ${y.y}: ${eur(y.total)} total, ${eur(y.interest)} interest">
+      <i style="height:${Math.max(1,h-iH)}px;background:var(--s2)"></i><i style="height:${Math.max(1,iH)}px;background:var(--s1)"></i><u>${y.y}</u></div>`;
+  }).join('');
+  const peakY = show.reduce((a,c)=>c.total>a.total?c:a, show[0]);
+  $('lgOwn').textContent = eur(show.reduce((a,c)=>a+c.own,0));
+  $('lgInt').textContent = eur(show.reduce((a,c)=>a+c.interest,0));
+  $('peakYear').textContent = `year ${peakY.y} · ${eur(peakY.total)}`;
+  $('cumHold').textContent = eur(m.cumOut);
+  $('sparkSub').textContent = `Cash out per year over ${m.hold} years. Costs inflate while the interest share of the mortgage falls${m.ifiCrossYear&&m.ifiCrossYear<=m.hold?`; the marked year is when IFI starts`:''}.`;
+
+  /* acquisition ledger */
+  $('tblAcq').innerHTML =
+    row('Purchase price', `${num0(m.price/m.surface)} €/m²`, eur(m.price)) +
+    row(m.neuf?'Taxe de publicité foncière':'Droits de mutation (DMTO)',
+        m.neuf ? '0,70 % + 2,37 % collection levy'
+               : `${m.primo?'4,50':'5,00'} % departmental + 1,20 % communal + 2,37 % levy = ${pc(m.dmtoRate*100)}`,
+        eur(m.dmto)) +
+    row('Émoluments du notaire', `Regulated scale + 20 % TVA${m.remise>0?` · ${eur(m.remise*1.2)} discount applied`:''}`, eur(m.emoTTC)) +
+    row('Contribution de sécurité immobilière', '0,10 % of price', eur(m.csi)) +
+    row('Débours et formalités', 'Land registry, cadastre, searches', eur(m.debours)) +
+    row('Loan guarantee', `${$('guarPct').value} % of ${eur(m.loan)}`, m.guarantee?eur(m.guarantee):'—', m.guarantee?'':'nil') +
+    row('Bank and broker fees', 'Frais de dossier, courtage', m.bankFees?eur(m.bankFees):'—', m.bankFees?'':'nil') +
+    row('Currency conversion', m.fxCost?'0,5 % on funds transferred':'Funding in euro', m.fxCost?eur(m.fxCost):'—', m.fxCost?'':'nil') +
+    tot('Cash required at signing', eur(m.cashAtSigning));
+  const totalFees = m.acqFees + m.guarantee + m.bankFees + m.fxCost;
+  $('acqNote').innerHTML = `Costs on top of the price come to <b>${eur(totalFees)}</b>, or ${pc(totalFees/m.price*100)} of it. Of what people call "frais de notaire", the notary's own regulated fee is only ${pc(m.emoTTC/m.acqFees*100)} — the other ${pc((1-m.emoTTC/m.acqFees)*100)} is tax collected on the state's behalf.`;
+
+  /* annual ledger */
+  $('tblAnn').innerHTML =
+    row('Charges de copropriété', `${$('chargeRate').value} €/m² × ${m.surface} m²`, eur(m.coproBase)) +
+    row('Fonds de travaux (ALUR)', `${$('alur').value} % of the annual budget`, eur(m.alur)) +
+    row('Works reserve', `${$('capex').value} % of value — ravalement, lift, roof, DPE`, eur(m.works)) +
+    row('Taxe foncière', `${$('tfRate').value} €/m², incl. TEOM`, eur(m.tf)) +
+    row("Taxe d'habitation", m.isPrimary?'Abolished on main homes since 2023':`${$('thRate').value} €/m² incl. 60 % Paris surcharge`, m.th?eur(m.th):'—', m.th?'':'nil') +
+    row('Home insurance', m.isPrimary?'MRH multirisque habitation':'PNO or MRH', eur(m.insHome)) +
+    row('Borrower insurance', `${$('insRate').value} % of ${eur(m.loan)} per year`, eur(m.insLoanYr)) +
+    row('Electricity', `${num0((m.elec-163)/0.2016)} kWh at 0,2016 €/kWh + standing charge`, eur(m.elec)) +
+    row('Gas', m.gas?'Individual gas heating':'No individual gas', m.gas?eur(m.gas):'—', m.gas?'':'nil') +
+    row('Water', m.water?`${num0(m.water/3.90)} m³ at 3,90 €/m³`:'Included in copropriété charges', m.water?eur(m.water):'—', m.water?'':'nil') +
+    row('Internet', `${$('internet').value} €/mo fibre`, eur(m.internet)) +
+    row('IFI wealth tax', m.ifiY1?`Net base ${eur(m.ifiBase0)}`:`Net base ${eur(m.ifiBase0)} — under the €1 300 000 threshold`, m.ifiY1?eur(m.ifiY1):'—', m.ifiY1?'':'nil') +
+    tot('Ownership cost, year 1', eur(m.ownershipOnly)) +
+    row('Mortgage payments', `${eur(m.sch.monthly)}/mo × 12`, eur(m.sch.monthly*12)) +
+    (m.letIt ? row('Rent collected', `${eur(m.grossRent/12)}/mo less ${$('vacancy').value} % vacancy`, '− '+eur(m.collected), 'cr') : '') +
+    (m.letIt ? row('Management', `${$('mgmt').value} % of rent collected`, eur(m.mgmtFee)) : '') +
+    (m.letIt ? row('French tax on rent',
+        m.regime==='reel' ? `Réel: ${eur(m.collected)} less ${eur(m.deductions)} deductible = ${eur(m.taxableRent)} taxable`
+                          : `${m.regime==='micro'?'30':'50'} % allowance → ${eur(m.taxableRent)} taxable`,
+        eur(m.rentIR+m.rentSocial)) : '') +
+    tot(m.letIt?'All-in, year 1, net of rent':'All-in, year 1', eur(m.allInYear1 - m.netRent));
+
+  /* exit ledger */
+  $('tblExit').innerHTML =
+    row(`Sale price after ${m.hold} years`, `${pc0(parseFloat($('growth').value))}/yr growth`, eur(m.saleValue)) +
+    row('Agency fee', `${$('saleFee').value} %, seller-borne`, '− '+eur(m.saleAgency)) +
+    row('Adjusted acquisition cost', `Price + ${eur(m.flatCosts)} costs${m.worksUplift?` + ${eur(m.worksUplift)} flat works uplift`:''}`, eur(m.acqForPV)) +
+    row('Taxable gain', m.exempt?'Main home of a French tax resident — exempt':`${eur(m.rawGain)} raw gain`, m.exempt?'—':eur(m.rawGain), m.exempt?'nil':'') +
+    row('Income tax at 19 %', m.exempt?'Exempt':`After ${Math.round(taperIR(m.hold)*100)} % taper → ${eur(m.gainIR)} base`, m.pvIR?'− '+eur(m.pvIR):'—', m.pvIR?'':'nil') +
+    row(`Social charges at ${m.socialRate===0.075?'7,5':'17,2'} %`, m.exempt?'Exempt':`After ${Math.round(taperSoc(m.hold)*100)} % taper → ${eur(m.gainSoc)} base`, m.pvSoc?'− '+eur(m.pvSoc):'—', m.pvSoc?'':'nil') +
+    row('Surtax on large gains', m.pvSur?'2–6 % above €50 000':'No surtax — gain under €50 000', m.pvSur?'− '+eur(m.pvSur):'—', m.pvSur?'':'nil') +
+    row('Fiscal representative', m.fiscalRep?'Required outside the EU/EEA above €150 000':'Not required', m.fiscalRep?'− '+eur(m.fiscalRep):'—', m.fiscalRep?'':'nil') +
+    row('Mortgage balance repaid', `Year ${m.hold} of a ${$('term').value}-year loan`, '− '+eur(m.lastBalance)) +
+    tot('Net proceeds', eur(m.netProceeds));
+  $('exitNote').innerHTML = m.exempt
+    ? `As a French tax resident selling your main home the gain is exempt outright — the single largest tax break in French property.`
+    : `French tax of <b>${eur(m.pvTax)}</b> on a ${eur(m.rawGain)} gain, an effective ${pc(m.pvTax/(m.rawGain||1)*100)}. Hold to year 22 and income tax disappears; to year 30 and social charges do too.`;
+
+  /* US ledger */
+  if(m.usPerson){
+    const nf = m.fxSell - m.fxBuy;
+    $('tblUS').innerHTML =
+      row('US cost basis', `${eur(m.price+m.acqFees)} at ${m.fxBuy.toFixed(2)} USD/EUR`, usd(m.usBasis)) +
+      row('US sale proceeds', `${eur(m.saleValue-m.saleAgency)} at ${m.fxSell.toFixed(2)} USD/EUR`, usd(m.usProceeds)) +
+      row('Dollar gain', m.usGainRaw>=0?'Measured in USD on both dates':'A dollar loss', usd(m.usGainRaw)) +
+      row('Of which currency movement', nf===0?'No FX movement assumed':`${nf>0?'Dollar weakened':'Dollar strengthened'} ${Math.abs(nf).toFixed(2)} over the hold`, usd(m.fxPhantom), Math.abs(m.fxPhantom)<1?'nil':'') +
+      row('Section 121 exclusion', m.s121?`Main home 2 of last 5 years, ${usd(m.s121Cap)} cap`:(m.isPrimary?'Needs 2 years of use in the last 5':'Not a main residence — unavailable'), m.s121?'− '+usd(m.s121):'—', m.s121?'':'nil') +
+      row('Taxable US gain', '', usd(m.usGain), 'sub') +
+      row(`Federal tax at ${$('usLtcg').value} %`, 'Long-term capital gains', usd(m.usTaxGross)) +
+      row('Foreign tax credit', m.ftc?`French plus-value tax of ${eur(m.pvTax)}, creditable on Form 1116`:'No French tax paid — nothing to credit', m.ftc?'− '+usd(m.ftc):'—', m.ftc?'':'nil') +
+      row('Net investment income tax', m.usNIIT?'3,8 %, and no foreign credit against it':'Below the threshold', m.usNIIT?usd(m.usNIIT):'—', m.usNIIT?'':'nil') +
+      row('State tax', m.usStateTax?`${$('usState').value} %, usually with no foreign credit`:'No state tax assumed', m.usStateTax?usd(m.usStateTax):'—', m.usStateTax?'':'nil') +
+      tot('US tax on the sale', usd(m.usNetGainTax)) +
+      (m.letIt ? row('Annual rental profit, US basis', `Rent less deductions and ${usd(m.usDepr)} of ADS depreciation`, usd(m.usRentProfit)) : '') +
+      (m.letIt ? row('US tax on rent, after credit', `${$('usMarginal').value} % marginal less ${usd(m.usRentFTC)} credit, plus NIIT`, usd(m.usRentTax)) : '') +
+      row('IFI — creditable?', 'A wealth tax, not an income tax. No US credit at all.', m.ifiY1?usd(m.ifiY1*m.fxBuy)+' / yr':'—', m.ifiY1?'':'nil');
+    const leak = m.usNIIT + m.usStateTax + Math.max(0, m.usTaxGross - m.ftc);
+    $('usNote').innerHTML = m.usGainRaw<=0
+      ? `No dollar gain at these rates, so nothing for the IRS to tax on the sale — but note that a strengthening dollar is what produced that result, not the French market.`
+      : `France taxes first and the US credits what France took, so the real extra cost is the part no credit reaches: <b>${usd(leak)}</b> here, from NIIT, state tax, and US rates exceeding the French bill. ${m.fxPhantom>1000?`And ${usd(m.fxPhantom)} of the dollar gain is pure currency movement — a gain you never made in euro.`:''}`;
+  }
+
+  /* watch list */
+  const W = [];
+  if(m.ifiY1>0){
+    W.push(['crit','IFI',`<b>IFI is payable from year one</b>Net taxable property of ${eur(m.ifiBase0)} clears the €1 300 000 threshold, costing ${eur(m.ifiY1)} this year. Mortgage principal is deductible, so the bill grows every year as the loan amortises.`]);
+  } else if(m.ifiCrossYear){
+    W.push(['warn','IFI',`<b>IFI starts in year ${m.ifiCrossYear}</b>Your net base is ${eur(m.ifiBase0)} today, under the threshold only because the mortgage is deductible. It crosses in year ${m.ifiCrossYear} as the loan amortises, at ${eur(m.years[m.ifiCrossYear-1].ifi)} that year.`]);
+  } else {
+    W.push(['good','IFI',`<b>No IFI across this hold period</b>Net taxable property stays under €1 300 000 throughout — deductible mortgage debt is doing the work. Pay the loan down faster and that changes.`]);
+  }
+  if(m.price>1000000 && m.ifiY1===0){
+    W.push(['info','1 M€',`<b>Over a million is not the test</b>A €1 M+ price does not itself trigger IFI. The test is net of deductible debt, after a 30 % allowance on a main home, measured on 1 January each year — so the same flat can be outside IFI this year and inside it later.`]);
+  }
+  if(m.newcomer) W.push(['good','964',`<b>Your five-year IFI shield is running</b>As a newly arrived resident you are taxed on French property only, for five years from arrival (CGI art. 964). ${m.otherRE>0?`That keeps ${eur(m.otherRE)} of other property out of the base until year 6.`:'Enter your other property above to see what joins the base in year 6.'} It expires on a date, not on a transaction — plan restructuring before then.`]);
+  if(m.dpe==='G') W.push(['crit','DPE',`<b>Class G cannot be let</b>New lettings of class G homes have been banned since 1 January 2025; F follows in 2028 and E in 2034. Price the renovation in, and check whether the copropriété has actually voted a plan.`]);
+  else if(m.dpe==='F') W.push(['warn','DPE',`<b>Class F is banned from letting in 2028</b>An <em>audit énergétique</em> is already mandatory to sell an F or G home. Two years of lead time to do the works.`]);
+  else if(m.dpe==='E') W.push(['warn','DPE',`<b>Class E is banned from letting in 2034</b>Far enough out to plan, close enough that the copropriété should be funding it now.`]);
+  if(m.isNonEU) W.push(['warn','REP',`<b>A fiscal representative is needed to sell</b>Non-residents outside the EU/EEA must appoint an accredited <em>représentant fiscal</em> for sales above €150 000 — typically 0,4–1 % of the price, deducted at closing.`]);
+  if(!m.isPrimary) W.push(['warn','T.H.',`<b>Second-home taxes stack</b>Taxe d'habitation applies with the maximum 60 % Paris surcharge, ${eur(m.th)} here. Leaving it genuinely empty does not help — the taxe sur les logements vacants then applies at 17 % of rental value, rising to 34 %.`]);
+  if(!m.isResident) W.push(['info','CSG',`<b>Social charges at ${m.socialRate===0.075?'7,5':'17,2'} %</b>${m.socialRate===0.075?'The reduced prélèvement de solidarité applies because you are covered by an EU, EEA or Swiss scheme.':'The full CSG/CRDS rate applies. Cover under an EU, EEA or Swiss social security scheme would cut it to 7,5 % — tick the box in section II to see the difference.'}`]);
+  if(m.usPerson){
+    W.push(['us','US',`<b>You file twice, forever</b>US citizens and green-card holders report worldwide income wherever they live. The Foreign Earned Income Exclusion covers wages only — it never shelters rent or a property gain. France taxes first; the US credits on Form 1116. Since 2019 the IRS accepts CSG and CRDS as creditable income taxes, which is worth real money.`]);
+    W.push(['us','FTC',`<b>Three places the credit runs out</b>The 3,8 % NIIT takes no foreign credit. Most states take none either — California taxes the whole gain. And IFI is a wealth tax, not an income tax, so it earns no credit at all and is pure additional cost.`]);
+    if(Math.abs(m.fxPhantom)>1000) W.push(['us','FX',`<b>${m.fxPhantom>0?`${usd(m.fxPhantom)} of phantom dollar gain`:`${usd(-m.fxPhantom)} of dollar gain erased`}</b>The IRS measures basis and proceeds at the spot rate on each date. ${m.fxPhantom>0?'Currency movement alone creates taxable US gain you never earned in euro — and French taper relief may leave no French tax to credit against it.':'A stronger dollar shrinks the US gain, but it also shrinks your real proceeds when you repatriate.'} Paying down a euro mortgage can separately trigger section 988 currency gain.`]);
+    if(m.letIt) W.push(['us','DEP',`<b>Depreciation is mandatory and recaptured</b>Foreign residential rental depreciates over 30 years under ADS — ${usd(m.usDepr)} a year here. You cannot decline it, and it is recaptured on sale whether or not you claimed it. French réel and US Schedule E also compute profit differently, so the two returns will not agree.`]);
+    if(m.viaSCI) W.push(['crit','SCI',`<b>An SCI is a US tax trap</b>France's standard succession wrapper may be a foreign corporation or partnership for US purposes — Form 5471 or 8865, Form 8858, possible PFIC treatment, and the loss of section 121 and long-term gain rates. Make the check-the-box election before you sign, with a cross-border adviser. Fixing it afterwards is expensive or impossible.`]);
+    W.push(['us','164',`<b>Your taxe foncière is not deductible</b>The TCJA abolished the deduction for foreign real property taxes. Mortgage interest on up to $750 000 of qualified-residence debt still is, for a main or one second home. FBAR covers French accounts over $10 000 aggregate; Form 8938 has separate, higher thresholds.`]);
+    W.push(['us','EST',`<b>Two estate tax systems, one treaty</b>The US taxes worldwide estates; France taxes French property and imposes reserved shares for children. The 1978 France–US estate tax treaty prevents double taxation and preserves the marital deduction, but it does not override French forced heirship — the EU Regulation 650/2012 election does, and only if made expressly in writing.`]);
+  }
+  if(!m.isResident || !m.isPrimary) W.push(['info','STR',`<b>Short-term letting is tightly held in Paris</b>Anything that is not your main home needs a <em>changement d'usage</em> with commercial compensation — buying and converting commercial space of equivalent size. A main home is capped at 120 nights a year. A registration number is mandatory either way, and the city audits.`]);
+  if(m.letIt) W.push(['warn','LOY',`<b>Rent is capped by law</b>Paris <em>encadrement des loyers</em> sets a <em>loyer de référence majoré</em> per m² by district, room count and period of construction. ${num0(m.grossRent/12/m.surface)} €/m²/month is what you have entered — check it against the official map before relying on the yield, because a tenant can demand a reduction and back-rent.`]);
+  W.push(['info','AG',`<b>Read three years of minutes before signing</b>The assemblée générale votes works you then owe. Ask for the procès-verbaux, the fonds de travaux balance, any <em>appel de fonds</em> already voted, and the date of the last ravalement — Paris requires façade works every ten years.`]);
+  W.push(['info','SUC',`<b>French law claims your estate by default</b>Reserved shares for children override a foreign will unless you expressly elect your national law under EU Regulation 650/2012. Unmarried partners and step-children are taxed as strangers, at up to 60 %.`]);
+  W.push(['good','SRU',`<b>Ten days to change your mind</b>After the compromis de vente the buyer has a ten-day cooling-off period, and the deposit — usually 5–10 % — is refundable within it, and later too if a <em>condition suspensive de prêt</em> fails.`]);
+  $('watch').innerHTML = W.map(([c,ic,tx])=>`<div class="w ${c}"><span class="ic">${ic}</span><span class="tx">${tx}</span></div>`).join('');
+}
+
+document.querySelectorAll('input,select').forEach(el=>{
+  el.addEventListener('input', compute);
+  el.addEventListener('change', compute);
+});
+$('themebtn').addEventListener('click', ()=>{
+  const cur = document.documentElement.getAttribute('data-theme');
+  const dark = cur ? cur==='dark' : window.matchMedia('(prefers-color-scheme: dark)').matches;
+  document.documentElement.setAttribute('data-theme', dark ? 'light' : 'dark');
+});
+buildSnail();
+compute();
+</script>
+
+</body>
+</html>
