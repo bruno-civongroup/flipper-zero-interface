@@ -84,3 +84,30 @@ npx wrangler pages deploy .
 ## License
 
 [MIT](LICENSE)
+
+## Deploy
+
+    bash deploy.sh            # stage, gate, deploy to production, verify
+    bash deploy.sh --dry-run  # stage and gate only, print the manifest
+
+**Never run `wrangler pages deploy .` here.** Cloudflare Pages uploads the
+entire directory and honors neither `.gitignore` nor `.assetsignore`, so a bare
+`deploy .` publishes every doc and note in this repo to the public web. A
+2026-11-04 audit found `README.md`, `flipper/README.md` and `LICENSE` publicly served on this site.
+
+`deploy.sh` copies the repo into a staging dir minus everything that is not a
+web asset, aborts if anything unexpected survives (allowlist by file type, so a
+**new doc is excluded by default** rather than shipping because nobody updated a
+denylist), deploys the staging dir, then probes the live site to confirm nothing
+leaked. If the gate rejects a file the site genuinely serves, widen the
+allowlist in `deploy.sh` — don't bypass the script.
+
+Docs and notes are safe to keep in this repo; they simply never ship.
+
+Removing a file from the deployment is **not** enough on its own: individual
+Cloudflare POPs kept serving cached copies (`cf-cache-status: HIT`,
+`s-maxage=604800`) that no purge method evicted. A WAF rule on the `brunomalnovic.com` zone,
+*"Block docs/dotfiles at the edge"*, blocks `*.md`, `*.map`, `/.git*`,
+`/.env*` and similar **before** cache — so those paths return 403 here by
+design. Full detail: `D:/Projects/CLAUDE.md` → "Cloudflare Pages deploy safety
+(2026-11-04 audit)".
